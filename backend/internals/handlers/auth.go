@@ -16,13 +16,15 @@ import (
 	"atheena/internals/entities"
 )
 
+
+// Deletes user's shit
 func DeleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 	// Here we delete the user entry by Id
 	// The api will recieve this Id as "string" format
 	// We have to convert it to primitive.ObjectID
 	objectIDstr := r.URL.Query().Get("object-id")
 	objectID,err := primitive.ObjectIDFromHex(objectIDstr)
-	
+
 	if err != nil {
 		log.Println("Something went wrong while converting string objective-id to primitive objective-id.");
 		return;
@@ -43,6 +45,8 @@ func DeleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(response);
 }
 
+
+// Logout makes the user's token disappear, without deleting his data from users.
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	email := r.URL.Query().Get("email");
 	role := r.URL.Query().Get("role");
@@ -222,3 +226,36 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	_ = json.NewEncoder(w).Encode(response);
 }
+
+// Helps to get fresh tokens for frontend.
+func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
+
+	if (r.Method != http.MethodPost) {
+		http.Error(w, "Supposed to be GET", http.StatusBadRequest);
+		return;
+	}
+
+	var request struct {
+		Refresh_Token string `json:"refresh_token"`
+	}
+
+	json.NewDecoder(r.Body).Decode(&request)
+
+	new_access_token, err, statusCode := _jwtAuth.RenewAccessToken(request.Refresh_Token)
+	
+	if (err != nil) {
+		log.Println("Something went wrong while renewing access token . (RefreshTokenHandler)");
+		http.Error(w, err.Error(), statusCode);
+		return;
+	}
+
+	w.WriteHeader(http.StatusOK);
+
+	response := map[string]interface{} {
+		"access_token":new_access_token,
+		"success":true,
+	}
+
+	json.NewEncoder(w).Encode(response);
+}
+

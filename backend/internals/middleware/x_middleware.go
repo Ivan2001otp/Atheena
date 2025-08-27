@@ -44,6 +44,7 @@ func TokenMiddleware(next http.Handler) http.Handler {
 			if (err != nil) {
 				log.Println("Something wrong happend Immanuel");
 				log.Println(err.Error());
+				
 				// checking whether the token is expired or not.
 				if err.(*jwt.ValidationError).Errors == jwt.ValidationErrorExpired {
 					http.Error(w, "Access Token expired" , http.StatusUnauthorized);
