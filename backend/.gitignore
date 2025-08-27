@@ -1,0 +1,4 @@
+.env
+go.sum
+internals/util/Constants.go
+.gitignore

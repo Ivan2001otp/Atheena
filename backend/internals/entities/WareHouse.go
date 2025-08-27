@@ -12,5 +12,5 @@ type WareHouse struct {
 	Address    string             `json:"address" bson:"address"`
 	State      string             `json:"state" bson:"state"`
 	Country    string             `json:"country" bson:"country"`
-	Created_At time.Time             `json:"created_at" bson:"created_at"`
+	Created_At time.Time          `json:"created_at" bson:"created_at"`
 }
