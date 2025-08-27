@@ -17,6 +17,8 @@ func GenerateRefreshToken() string {
 	return util.GenerateRandomUUID()
 }
 
+
+
 // access_token, refresh_token, error, http_status (Generates new tokens)
 func GenerateNewAccessAndRefreshTokens(user entities.User) (*string, *string, error, int){
 
@@ -32,13 +34,6 @@ func GenerateNewAccessAndRefreshTokens(user entities.User) (*string, *string, er
 
 	// Set 7 days as expiry..
 	expiry := time.Now().Add(7 * 24 * time.Hour);
-
-	err = _mongo.InsertNewUser(user)
-	if (err != nil ) {
-		log.Println("Something went wrong, while inserting new user !");
-		return nil, nil, err, http.StatusInternalServerError;
-	}
-
 	created_time,_ := util.GenerateCreateDateTime()
 
 	authToken := entities.AuthToken{
@@ -70,7 +65,7 @@ func RenewAccessToken(refreshToken string) (*string, error, int) {
 	}
 
 	if (time.Now().After(authToken.Expiry_Time)) {
-		return nil, fmt.Errorf("Expired token"), http.StatusForbidden;
+		return nil, fmt.Errorf("expired token"), http.StatusForbidden;
 	}
 
 	newAccessToken, err := GenerateAccessToken(authToken.Email, authToken.Role)
