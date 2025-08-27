@@ -1,6 +1,8 @@
 module atheena
 
-go 1.21.5
+go 1.23.0
+
+toolchain go1.24.6
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
@@ -19,4 +21,5 @@ require (
 	golang.org/x/crypto v0.26.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/text v0.17.0 // indirect
+	golang.org/x/time v0.12.0 // indirect
 )
