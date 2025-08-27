@@ -3,8 +3,9 @@ package util
 import (
 	"log"
 	"sync"
-
+	"time"
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var (
@@ -19,4 +20,12 @@ func GenerateRandomUUID() string {
 	uuid_generator = uuid.New()
 	log.Println("Generated new UUID : ", uuid_generator.String())
 	return uuid_generator.String();
+}
+
+func GenerateObjectID() primitive.ObjectID {
+	return primitive.NewObjectID()
+}
+
+func GenerateCreateDateTime()( time.Time, error) {
+	return time.Parse(time.RFC3339, time.Now().Format(time.RFC3339));
 }
