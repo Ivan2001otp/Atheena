@@ -22,6 +22,70 @@ func handleDBConnection(err error) {
 }
 
 
+// Supervisor level CRUD
+func UpsertNewSupervisor(supervisor _entities.Supervisor) error {
+	mongoDb, err := GetMongoClient();
+	handleDBConnection(err);
+
+	collection := mongoDb.Database(_util.DATABASE).Collection(_util.SUPERVISORS);
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second);
+	defer cancel()
+	
+	filter := bson.M{"_id":supervisor.ID}
+	update := bson.M{
+		"$set" : bson.M{
+			"admin_id":supervisor.AdminID,
+			"name":supervisor.Name,
+			"email":supervisor.Email,
+			"phone_number":supervisor.PhoneNumber,
+			"role":supervisor.Role,
+		},
+	}
+
+	opts := options.Update().SetUpsert(true)
+	result, err := collection.UpdateOne(ctx, filter, update, opts)
+	if err != nil {
+		log.Println("❌Failed to upsert supervisor : ", err);
+		return err;
+	}
+
+
+	if result.MatchedCount > 0 {
+		log.Println("✅Supervisor Upserted successfully")
+	} else if result.UpsertedCount > 0 {
+		log.Println("✅Supervisor Inserted successfully")
+	}
+	
+	return nil;
+}
+
+func DeleteSupervisor(supervisor _entities.Supervisor) error {
+	mongoDb, err := GetMongoClient();
+	handleDBConnection(err);
+
+	collection := mongoDb.Database(_util.DATABASE).Collection(_util.SUPERVISORS);
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second);
+
+	defer cancel();
+
+	result, err := collection.DeleteOne(ctx, bson.M{"_id":supervisor.ID})
+	if err != nil {
+		log.Println("Failed to delete supervisor : ", err);
+		return err;
+	}
+
+	if result.DeletedCount > 0 {
+		log.Println("Supervisor deleted successfully !");
+	} else {
+		log.Println("No supervisor found with the given ID");
+	}
+
+	return nil;
+}
+
+
+// Admin level CRUD and token operations
+
 func InsertNewUser(user _entities.User) error {
 	mongoDb, err := GetMongoClient()
 
