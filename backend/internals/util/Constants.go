@@ -12,6 +12,9 @@ var DATABASE string = "ATHEENA"
 
 // collection name
 var USERS string  = "USERS"
+
+var SUPERVISORS string = "SUPERVISORS"
+
 var TOKENS string = "TOKENS";
 
 
