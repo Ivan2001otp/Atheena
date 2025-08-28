@@ -23,6 +23,98 @@ func handleDBConnection(err error) {
 
 
 
+
+//Sites related CRUD
+func UpsertNewConstructionSiteesByAdmin(constructionSite _entities.Site) error {
+	mongoDb, err := GetMongoClient();
+	handleDBConnection(err);
+
+	collection := mongoDb.Database(_util.DATABASE).Collection(_util.SITES);
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second);
+	defer cancel()
+
+	filter := bson.M{"_id": constructionSite.ID}
+	update := bson.M{
+		"$set": bson.M{
+            "name":    constructionSite.Name,
+            "address": constructionSite.Address,
+            "state":   constructionSite.State,
+            "country": constructionSite.Country,
+            "updated_time":    constructionSite.Updated_At,
+        },
+	}
+
+	opts := options.Update().SetUpsert(true)
+
+    result, err := collection.UpdateOne(ctx, filter, update, opts)
+    if err != nil {
+        log.Println("Failed to upsert construction site:", err)
+        return err
+    }
+
+    if result.MatchedCount > 0 {
+        log.Println("Construction site updated successfully")
+    } else if result.UpsertedCount > 0 {
+        log.Println("New construction site inserted with ID:", result.UpsertedID)
+    }
+
+    return nil
+}
+
+
+
+
+
+// warehouse related CRUD.
+func AddWarehouseByUser(warehouse _entities.WareHouse) error {
+
+	mongoDb, err:= GetMongoClient()
+	handleDBConnection(err)
+
+	collection := mongoDb.Database(_util.DATABASE).Collection(_util.WAREHOUSES);
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	defer cancel();
+
+	
+	filter:=bson.M{"user_id":warehouse.ID}
+	update := bson.M{
+		"$set" : bson.M{
+			 "user_id":    warehouse.User_Id,
+            "name":       warehouse.Name,
+            "location":   warehouse.Location,
+            "address":    warehouse.Address,
+            "state":      warehouse.State,
+            "country":    warehouse.Country,
+            "created_at": warehouse.Created_At,
+		},
+	}
+
+	opts := options.Update().SetUpsert(true)
+	result, err := collection.UpdateOne(ctx, filter, update, opts)
+	if err != nil {
+		log.Println("Failed to Upsert warehouse:", err);
+		return err;
+	}
+
+	if result.MatchedCount > 0 {
+        log.Println("Warehouse updated successfully")
+    } else if result.UpsertedCount > 0 {
+        log.Println("New warehouse inserted with ID:", result.UpsertedID)
+    }
+
+	return nil;
+}
+
+
+func DeleteWarehouseById(warehouseId primitive.ObjectID) error {
+	// mongoDb, err := GetMongoClient();
+	// handleDBConnection(err);
+
+	// Fetch the inventory items of this warehouse
+	return nil;
+}
+
+
 // Supervisor level CRUD
 func UpsertNewSupervisor(supervisor _entities.Supervisor) error {
 	mongoDb, err := GetMongoClient();

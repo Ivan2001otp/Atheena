@@ -11,5 +11,5 @@ type Site struct {
 	Address string `json:"address" bson:"address"`
 	State string `json:"state" bson:"state"`
 	Country string `json:"country" bson:"country"`
-	Updated_At time.Time `json:"time" bson:"time"`
+	Updated_At time.Time `json:"updated_time" bson:"updated_time"`
 }

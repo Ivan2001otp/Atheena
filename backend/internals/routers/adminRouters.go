@@ -22,5 +22,8 @@ func RegisterAdminRouters(apiRouter *mux.Router) {
 
 	apiRouter.HandleFunc("/upsert_supervisor",handlers.AddOrUpdateSupervisor).Methods("POST");
 	apiRouter.HandleFunc("/delete_supervisor", handlers.DeleteSupervisor).Methods("POST");
-	
+
+	apiRouter.HandleFunc("/add_construction_site", handlers.AddConstructionSite).Methods("POST");
+	apiRouter.HandleFunc("/add_warehouse", handlers.AddNewWarehouse).Methods("POST");
+
 }

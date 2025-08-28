@@ -16,6 +16,7 @@ var USERS string  = "USERS"
 var SUPERVISORS string = "SUPERVISORS"
 
 var TOKENS string = "TOKENS";
-
+var WAREHOUSES string = "WAREHOUSES"
+var SITES string = "SITES";
 
 
