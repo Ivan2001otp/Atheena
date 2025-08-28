@@ -23,6 +23,7 @@ func handleDBConnection(err error) {
 
 
 
+
 //Sites related CRUD
 func UpsertNewConstructionSiteesByAdmin(constructionSite _entities.Site) error {
 	mongoDb, err := GetMongoClient();
@@ -112,6 +113,7 @@ func DeleteWarehouseById(warehouseId primitive.ObjectID) error {
 	// Fetch the inventory items of this warehouse
 	return nil;
 }
+
 
 // Supervisor level CRUD
 func UpsertNewSupervisor(supervisor _entities.Supervisor) error {
