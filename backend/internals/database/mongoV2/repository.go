@@ -1,0 +1,179 @@
+package database
+
+import (
+	_entities "atheena/internals/entities"
+	_util "atheena/internals/util"
+	"context"
+	"fmt"
+	"log"
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+)
+
+
+func handleDBConnection(err error) {
+	if err != nil {
+	log.Fatal("Something went wrong, while DB instantiation !");
+	}
+}
+
+
+func InsertNewUser(user _entities.User) error {
+	mongoDb, err := GetMongoClient()
+
+	handleDBConnection(err);
+
+	collection := mongoDb.Database(_util.DATABASE).Collection(_util.USERS);
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second);
+
+	defer cancel();
+
+	// insert document...
+	_, err = collection.InsertOne(ctx, user);
+	return err;
+} 
+
+// Upserts the auth token
+func InsertAuthToken(authToken _entities.AuthToken) error {
+	mongoDb, err := GetMongoClient();
+
+	handleDBConnection(err);
+	
+	collection := mongoDb.Database(_util.DATABASE).Collection(_util.TOKENS);
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second);
+	defer cancel();
+
+	// upsert query
+	filter := bson.M{"user_id":authToken.User_Id}
+	update := bson.M{
+		"$set":bson.M{
+			"email":authToken.Email,
+			"role":authToken.Role,
+			"refresh_token":authToken.Refresh_Token,
+			"expiry_time":authToken.Expiry_Time,
+			"created_at":authToken.Created_At,
+		},
+	}
+
+	opts := options.Update().SetUpsert(true);
+
+	_, err = collection.UpdateOne(ctx, filter, update, opts);
+	return err;
+}
+
+
+func GetTokenByRefreshToken(refreshToken string) (*_entities.AuthToken, error ) {
+	mongoDb , err := GetMongoClient()
+	handleDBConnection(err);
+
+	var token _entities.AuthToken;
+	collection := mongoDb.Database(_util.DATABASE).Collection(_util.TOKENS);
+	ctx,cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	defer cancel();
+
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err;
+	}
+
+	err = collection.FindOne(ctx, bson.M{"refresh_token": refreshToken}).Decode(&token);
+	if err != nil {
+		log.Println(err.Error());
+		return &token, err;
+	}
+
+	log.Println("The created time is ", _util.FormatDateTime(token.Created_At))
+	log.Println("The expiry time is ", _util.FormatDateTime(token.Expiry_Time))
+	log.Println("Successfully fetched the refresh token ✅ - ",token.Refresh_Token);
+	
+	return &token, nil;
+}
+
+
+func DeleteUserById(objectId primitive.ObjectID) error {
+	mongoDb, err := GetMongoClient();
+	handleDBConnection(err);
+
+	collection := mongoDb.Database(_util.DATABASE).Collection(_util.USERS);
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second);
+	defer cancel();
+
+	result, err := collection.DeleteOne(ctx, bson.M{"_id":objectId});
+	if (err != nil) {
+		log.Println("Could not delete user by Id");
+		log.Println(err.Error());
+		return err;
+	}
+
+	log.Println("The user record delete count is ", result.DeletedCount);
+	if (result.DeletedCount > 0) {
+		log.Println("Successfully deleted the User from USER table.")
+	} else {
+		log.Println("Failed to delete the User from USER table.");
+		return fmt.Errorf("The user is already been deleted or record does not exist to delete.")
+	}
+
+	return nil;
+}
+
+
+
+func DeleteLoggedOutRefreshToken(email, role string) error {
+	mongoDb, err := GetMongoClient()
+	handleDBConnection(err);
+
+	collection := mongoDb.Database(_util.DATABASE).Collection(_util.TOKENS);
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second);
+	defer cancel();
+
+	result, err := collection.DeleteOne(ctx,
+		 bson.M{"email":email, "role":role}, 
+		);
+
+	log.Println("Deleted logout count : ", result.DeletedCount);
+
+	if err != nil {
+		log.Println("❌ Could not delete the Refresh token from TOKENS table.");
+		log.Println(err.Error());
+		return err;
+	}
+
+
+	if (result.DeletedCount > 0) {
+		log.Println("✅ Succesfully deleted the refresh-token")
+	} else {
+		log.Println("❌ Could not delete the record from TOKENS table")
+		return fmt.Errorf("⚠️ The target token is already deleted . Try to contact db admin to confirm.");
+	}
+
+	return nil;
+}
+
+
+func EmailExists(email string) (*_entities.User, error) {
+
+	mongoDb , err := GetMongoClient();
+	handleDBConnection(err);
+
+	collection := mongoDb.Database(_util.DATABASE).Collection(_util.USERS);
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second);
+	defer cancel();
+
+	var user _entities.User
+	err = collection.FindOne(ctx, bson.M{"email":email}).Decode(&user);
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			// email does not exists.
+			return nil, nil;
+		}
+
+		return nil, err;
+	}
+
+	return &user, nil;
+}

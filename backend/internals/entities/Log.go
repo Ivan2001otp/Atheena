@@ -6,7 +6,7 @@ import (
 )
 
 type CustomLog struct {
-	ID primitive.ObjectID `json:"id" bson:"id"` // p.k
+	ID primitive.ObjectID `json:"id" bson:"_id"` // p.k
 	Supply_Id primitive.ObjectID `json:"supply_id" bson:"supply_id"`// f.k
 	From_Warehouse_Id primitive.ObjectID `json:"from_warehouse_id"  bson:"from_warehouse_id"`
 	To_Warehouse_Id primitive.ObjectID `json:"to_warehouse_id" bson:"to_warehouse_id"`
