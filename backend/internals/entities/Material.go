@@ -6,7 +6,7 @@ import (
 )
 
 type Material struct {
-	ID primitive.ObjectID `json:"id" bson:"id"`//p.k
+	ID primitive.ObjectID `json:"id" bson:"_id"`//p.k
 	Name string `json:"name" bson:"name"` // cements, rods, sand, gravel
 
 	WareHouse_Id primitive.ObjectID `json:"warehouse_id" bson:"warehouse_id"`

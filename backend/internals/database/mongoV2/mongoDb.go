@@ -33,14 +33,14 @@ func GetMongoClient() (*mongo.Client, error) {
 		
 		if err != nil {
 			clientInstanceErr = err;
-			log.Println("Something went wrong during connecting to mongo !");
+			log.Println("❌ Something went wrong during connecting to mongo !");
 			return ;
 		}
 
 		// Ping to Verfiy connection
 		if err := client.Ping(ctx, nil); err != nil {
 			clientInstanceErr = err;
-			log.Println("Something went wrong on pinging db!")
+			log.Println("❌ Something went wrong on pinging db!")
 			return;
 		}
 

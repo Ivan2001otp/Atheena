@@ -6,7 +6,7 @@ import (
 
 // This the model representation for resource consumption
 type Resource struct {
-	ID primitive.ObjectID `json:"id" bson:"id"`//p.k
+	ID primitive.ObjectID `json:"id" bson:"_id"`//p.k
 	WareHouse_Id primitive.ObjectID `json:"warehouse_id" bson:"warehouse_id"`
 	Site_Id primitive.ObjectID `json:"site_id" bson:"site_id"`
 	Name string `json:"name" bson:"name"` // resource name like rods, gravel... etc

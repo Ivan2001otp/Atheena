@@ -19,7 +19,7 @@ func GenerateRefreshToken() string {
 
 
 
-// access_token, refresh_token, error, http_status (Generates new tokens)
+// access_token, refresh_token, error, http_status (Generates new tokens and inserts new user)
 func GenerateNewAccessAndRefreshTokens(user entities.User) (*string, *string, error, int){
 
 	access_token , err := GenerateAccessToken(user.Email, user.Role);
@@ -33,7 +33,7 @@ func GenerateNewAccessAndRefreshTokens(user entities.User) (*string, *string, er
 	refresh_token := GenerateRefreshToken()
 
 	// Set 7 days as expiry..
-	expiry := time.Now().Add(7 * 24 * time.Hour);
+	expiry, _ :=  time.Parse( time.RFC3339, time.Now().Add(7 * 24 * time.Hour).Format(time.RFC3339));
 	created_time,_ := util.GenerateCreateDateTime()
 
 	authToken := entities.AuthToken{
@@ -63,6 +63,9 @@ func RenewAccessToken(refreshToken string) (*string, error, int) {
 		log.Println("Something went wrong  while renewing access token");
 		return nil, err, http.StatusInternalServerError;
 	}
+
+	log.Println("The time.Now() is ", util.FormatDateTime(time.Now()))
+	log.Println("The expiry time of token is ", util.FormatDateTime(authToken.Expiry_Time))
 
 	if (time.Now().After(authToken.Expiry_Time)) {
 		return nil, fmt.Errorf("expired token"), http.StatusForbidden;

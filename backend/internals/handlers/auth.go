@@ -22,11 +22,22 @@ func DeleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 	// Here we delete the user entry by Id
 	// The api will recieve this Id as "string" format
 	// We have to convert it to primitive.ObjectID
-	objectIDstr := r.URL.Query().Get("object-id")
-	objectID,err := primitive.ObjectIDFromHex(objectIDstr)
+
+	if (r.Method != http.MethodPost) {
+		http.Error(w, "Only POST request eligible.", http.StatusBadRequest);
+		return;
+	}
+
+	var request struct {
+		ObjectID  string `json:"object_id"`
+	}
+
+	json.NewDecoder(r.Body).Decode(&request);
+	objectID, err := primitive.ObjectIDFromHex(request.ObjectID)
 
 	if err != nil {
-		log.Println("Something went wrong while converting string objective-id to primitive objective-id.");
+		log.Println(err.Error())
+		log.Fatal("Something went wrong while converting string objective-id to primitive objective-id.");
 		return;
 	}
 
@@ -38,16 +49,24 @@ func DeleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := map[string]interface{}{
-		"success":"true",
-		"message":"logout successfully",
+		"success":true,
+		"message":"Account Deleted Successfully",
 	}
 
+	log.Println("✅ Deleted account action successful");
 	_ = json.NewEncoder(w).Encode(response);
 }
 
 
 // Logout makes the user's token disappear, without deleting his data from users.
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+
+	if (r.Method != http.MethodPost) {
+		http.Error(w, "Only POST request eligible.", http.StatusBadRequest);
+		return;
+	}
+
+
 	email := r.URL.Query().Get("email");
 	role := r.URL.Query().Get("role");
 
@@ -65,6 +84,8 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		"success":true,
 		"message":"logout successfully",
 	}
+
+	log.Println("✅ Logout action successful");
 
 	_= json.NewEncoder(w).Encode(response)
 
@@ -139,6 +160,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		"refresh_token":refresh_token,
 	}
 
+	log.Println("✅ Login successfully");
 
 	json.NewEncoder(w).Encode(response);
 }
@@ -223,6 +245,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		"message":"success",
 	}
 
+	log.Println("✅ Register successfully");
 
 	_ = json.NewEncoder(w).Encode(response);
 }
@@ -231,7 +254,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	if (r.Method != http.MethodPost) {
-		http.Error(w, "Supposed to be GET", http.StatusBadRequest);
+		http.Error(w, "Supposed to be POST", http.StatusBadRequest);
 		return;
 	}
 
@@ -256,6 +279,7 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 		"success":true,
 	}
 
+	log.Println("✅ Refreshed Tokens successfully");
 	json.NewEncoder(w).Encode(response);
 }
 

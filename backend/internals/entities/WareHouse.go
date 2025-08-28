@@ -5,7 +5,7 @@ import ("go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type WareHouse struct {
-	ID         primitive.ObjectID `json:"id" bson:"id"`
+	ID         primitive.ObjectID `json:"id" bson:"_id"`
 	User_Id    primitive.ObjectID `json:"user_id" bson:"user_id"`
 	Name       string             `json:"name" bson:"name"`
 	Location   string             `json:"location" bson:"location"`

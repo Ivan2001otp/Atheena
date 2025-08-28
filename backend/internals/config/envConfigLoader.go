@@ -31,8 +31,9 @@ func getEnv(key, fallback string)  string {
 func LoadEnvConfig() *Config{
 	once.Do(func() {
 
-		if  err := godotenv.Load(); err != nil {
-			log.Println("⚠️ Failed to read .env file. Something wrong with path or **");
+		if  err := godotenv.Load(".env"); err != nil {
+			log.Println(err.Error())
+			log.Fatal("⚠️ Failed to read .env file. Something wrong with path or **");
 		}
 
 		instance = &Config{

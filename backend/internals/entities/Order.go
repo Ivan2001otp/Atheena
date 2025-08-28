@@ -11,7 +11,7 @@ type OrderTracker struct {
 }
 
 type Order struct {
-	ID primitive.ObjectID `json:"id" bson:"id"`
+	ID primitive.ObjectID `json:"id" bson:"_id"`
 	Log_Id primitive.ObjectID `json:"log_id" bson:"log_id"`
 	Material_Name string `json:"material_name" bson:"material_name"`
 	Quantity int `json:"quantity" bson:"quantity"`

@@ -29,3 +29,7 @@ func GenerateObjectID() primitive.ObjectID {
 func GenerateCreateDateTime()( time.Time, error) {
 	return time.Parse(time.RFC3339, time.Now().Format(time.RFC3339));
 }
+
+func FormatDateTime(t time.Time) string {
+	return t.Format("2006-01-02 03:04:05 PM");
+}

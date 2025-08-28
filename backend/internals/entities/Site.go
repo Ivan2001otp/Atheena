@@ -6,7 +6,7 @@ import (
 )
 
 type Site struct {
-	ID primitive.ObjectID `json:"id" bson:"id"`
+	ID primitive.ObjectID `json:"id" bson:"_id"`
 	Name string `json:"name" bson:"name"`
 	Address string `json:"address" bson:"address"`
 	State string `json:"state" bson:"state"`

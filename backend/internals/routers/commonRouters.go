@@ -13,7 +13,9 @@ func RegisterCommonRouters(apiRouter *mux.Router) {
 	apiRouter.Use(func(next http.Handler) http.Handler {
 		return middleware.RateLimitMiddleware(next.ServeHTTP)
 	});
-	
-	apiRouter.HandleFunc("/logout",handlers.LogoutHandler);
-	apiRouter.HandleFunc("/delete_account", handlers.DeleteAccountHandler);
+
+		
+	apiRouter.HandleFunc("/login", handlers.LoginHandler).Methods("POST");
+	apiRouter.HandleFunc("/register", handlers.RegisterHandler).Methods("POST");
+	apiRouter.HandleFunc("/refresh-token", handlers.RefreshTokenHandler).Methods("POST");
 }
