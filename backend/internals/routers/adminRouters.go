@@ -1,0 +1,26 @@
+package routers
+
+
+import (
+	"net/http"
+	"github.com/gorilla/mux"
+
+	"atheena/internals/middleware"
+	"atheena/internals/handlers"
+)
+
+
+func RegisterAdminRouters(apiRouter *mux.Router) {
+	apiRouter.Use(func(handler http.Handler) http.Handler{
+		return middleware.RateLimitMiddleware(handler.ServeHTTP)
+	});
+
+
+	apiRouter.Use(func(handler http.Handler) http.Handler {
+		return middleware.TokenMiddleware(handler);
+	})
+
+	apiRouter.HandleFunc("/upsert_supervisor",handlers.AddOrUpdateSupervisor).Methods("POST");
+	apiRouter.HandleFunc("/delete_supervisor", handlers.DeleteSupervisor).Methods("POST");
+	
+}

@@ -59,7 +59,7 @@ func UpsertNewSupervisor(supervisor _entities.Supervisor) error {
 	return nil;
 }
 
-func DeleteSupervisor(supervisor _entities.Supervisor) error {
+func DeleteSupervisor(supervisorID primitive.ObjectID, adminID primitive.ObjectID) error {
 	mongoDb, err := GetMongoClient();
 	handleDBConnection(err);
 
@@ -68,16 +68,17 @@ func DeleteSupervisor(supervisor _entities.Supervisor) error {
 
 	defer cancel();
 
-	result, err := collection.DeleteOne(ctx, bson.M{"_id":supervisor.ID})
+	
+	result, err := collection.DeleteOne(ctx, bson.M{"_id":supervisorID, "admin_id":adminID})
 	if err != nil {
 		log.Println("Failed to delete supervisor : ", err);
 		return err;
 	}
 
 	if result.DeletedCount > 0 {
-		log.Println("Supervisor deleted successfully !");
+		log.Println("✅ Supervisor deleted successfully !");
 	} else {
-		log.Println("No supervisor found with the given ID");
+		log.Println("⚠️ No supervisor found with the given ID");
 	}
 
 	return nil;
@@ -177,7 +178,7 @@ func DeleteUserById(objectId primitive.ObjectID) error {
 	if (result.DeletedCount > 0) {
 		log.Println("Successfully deleted the User from USER table.")
 	} else {
-		log.Println("Failed to delete the User from USER table.");
+		log.Println("⚠️ Failed to delete the User from USER table.");
 		return fmt.Errorf("The user is already been deleted or record does not exist to delete.")
 	}
 

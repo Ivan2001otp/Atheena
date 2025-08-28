@@ -1,16 +1,16 @@
 package handlers
 
-
 import (
-	"log"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
-	_entities "atheena/internals/entities"
 	_mongo "atheena/internals/database/mongoV2"
+	_entities "atheena/internals/entities"
 )
 
 
@@ -21,8 +21,8 @@ func DeleteSupervisor(w http.ResponseWriter, r *http.Request) {
 		return;
 	}
 
-	var supervisor _entities.Supervisor
-	err := json.NewDecoder(r.Body).Decode(&supervisor);
+	var requestPayload map[string]interface{}
+	err := json.NewDecoder(r.Body).Decode(&requestPayload);
 
 	if err != nil {
 		log.Println("could not parse request body to delete supervisor");
@@ -31,7 +31,19 @@ func DeleteSupervisor(w http.ResponseWriter, r *http.Request) {
 		return;
 	}
 
-	err = _mongo.DeleteSupervisor(supervisor)
+	var adminId, superVisorId primitive.ObjectID
+	adminIdStr, ok := requestPayload["admin_id"].(string)
+	if (ok) {
+		adminId,_ = primitive.ObjectIDFromHex(adminIdStr)
+	}
+
+	supervisorIdStr , ok :=  requestPayload["id"].(string)
+	if (ok) {
+		superVisorId,_ = primitive.ObjectIDFromHex(supervisorIdStr)
+	}
+
+
+	err = _mongo.DeleteSupervisor(superVisorId, adminId)
 	if err != nil {
 		log.Println("Something went wrong while deleting supervisor");
 		log.Println(err.Error());
@@ -40,8 +52,8 @@ func DeleteSupervisor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := map[string]interface{}{
-		"success":false,
-		"message":fmt.Sprintf("%s - supervisor is removed successfully."),
+		"success":true,
+		"message":fmt.Sprintf("%s - supervisor is removed successfully.", superVisorId.Hex()),
 	}
 
 	json.NewEncoder(w).Encode(response);
@@ -54,8 +66,10 @@ func AddOrUpdateSupervisor(w http.ResponseWriter, r *http.Request) {
 		return;
 	}
 
+	var requestPayload map[string]interface{}
 	var supervisor _entities.Supervisor
-	err := json.NewDecoder(r.Body).Decode(&supervisor);
+
+	err := json.NewDecoder(r.Body).Decode(&requestPayload);
 
 	if err != nil {
 		log.Println("could not parse request body to create supervisor");
@@ -65,8 +79,34 @@ func AddOrUpdateSupervisor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	supervisor.ID = primitive.NewObjectID()
+
+	adminIdStr , ok := requestPayload["admin_id"].(string)
+	if (ok){
+	  supervisor.AdminID ,_ = primitive.ObjectIDFromHex(adminIdStr)
+	}
+
+	nameStr, ok := requestPayload["name"].(string)
+	if (ok) {
+		supervisor.Name = nameStr
+	}
+
+	emailStr, ok := requestPayload["email"].(string)
+	if (ok) {
+		supervisor.Email = emailStr;
+	}
+
+	phoneNumStr, ok := requestPayload["phone_number"].(string)
+	if (ok) {
+		supervisor.PhoneNumber = phoneNumStr;
+	}
+
+	roleStr, ok := requestPayload["role"].(string)
+	if (ok) {
+		supervisor.Role = roleStr;
+	}
+
 	supervisor.Created_At,_ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339));
-	
+
 	err=_mongo.UpsertNewSupervisor(supervisor)
 	if err != nil {
 		log.Println("Something wrong happened while upserting supervisor");
