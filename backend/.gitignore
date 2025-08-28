@@ -1,5 +1,8 @@
 cmd/.env
 go.sum
 go.mod
+internals/util/Constants.go
+
 .gitignore
 internals/config/
+
