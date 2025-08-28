@@ -66,11 +66,13 @@ func main() {
 
 	commonRouters := mainRouter.PathPrefix("/api/v1").Subrouter()
 	exitRouters := mainRouter.PathPrefix("/api/v1").Subrouter();
+
 	adminRouters := mainRouter.PathPrefix("/api/v1").Subrouter();
 
 	routers.RegisterCommonRouters(commonRouters);
 	routers.RegisterAuthExitRouters(exitRouters);
 	routers.RegisterAdminRouters(adminRouters);
+
 
 	// setting cors options
 	handler := corsOptions.Handler(mainRouter)

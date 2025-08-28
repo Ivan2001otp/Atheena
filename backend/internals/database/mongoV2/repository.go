@@ -22,6 +22,7 @@ func handleDBConnection(err error) {
 }
 
 
+
 // Supervisor level CRUD
 func UpsertNewSupervisor(supervisor _entities.Supervisor) error {
 	mongoDb, err := GetMongoClient();
@@ -178,7 +179,9 @@ func DeleteUserById(objectId primitive.ObjectID) error {
 	if (result.DeletedCount > 0) {
 		log.Println("Successfully deleted the User from USER table.")
 	} else {
+
 		log.Println("⚠️ Failed to delete the User from USER table.");
+
 		return fmt.Errorf("The user is already been deleted or record does not exist to delete.")
 	}
 

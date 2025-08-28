@@ -30,8 +30,10 @@ func DeleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 
 	var request struct {
 		ObjectID  string `json:"object_id"`
+
 		Email string `json:"email"`
 		Role string `json:"role"`
+
 	}
 
 	json.NewDecoder(r.Body).Decode(&request);
@@ -43,6 +45,7 @@ func DeleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 		return;
 	}
 
+
 	// delete the user and delete the token as well.
 	err = _mongoRepo.DeleteUserById(objectID)
 	if err != nil {
@@ -51,7 +54,9 @@ func DeleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 		return;
 	}
 
+
 	 err = _mongoRepo.DeleteLoggedOutRefreshToken(request.Email, request.Role)
+
 
 	response := map[string]interface{}{
 		"success":true,
