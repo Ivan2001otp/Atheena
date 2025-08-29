@@ -64,17 +64,20 @@ const RegisterPage = () => {
     async function hitAdminRegisterApi() {
 
       try {
+        
         const res = await RegisterAdmin(payload);
         console.log(res);
 
         // 15mins 
-        JsCookies.set(ACCESS_TOKEN, res.access_token, {expires: 0.0104,httpOnly:true, secure: true, sameSite: "Strict" })
-        // 7 days 
-        JsCookies.set(REFRESH_TOKEN, res.refresh_token, {expires: 7,httpOnly:true, secure: true, sameSite: "Strict" })
+        JsCookies.set(ACCESS_TOKEN, res.access_token, {expires: 0.0104, secure: true, sameSite: "Strict" });
+        // 1 day
+        JsCookies.set(REFRESH_TOKEN, res.refresh_token, {expires: 1, secure: true, sameSite: "Strict" })
         console.log("success");
 
+        
 
-        navigate("/dashboard", {state : {"admin":res.admin}});
+       navigate("/dashboard", {state : {"admin":payload}});
+
       
       } catch (error : any) {
 

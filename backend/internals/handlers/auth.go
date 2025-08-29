@@ -169,11 +169,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		"message":"success",
 		"access_token":access_token,
 		"refresh_token":refresh_token,
-		"admin": fetchedUser,
+		"name":fetchedUser.Name,
+		"email":fetchedUser.Email,
+		"id":fetchedUser.ID.Hex(),
+		"role":_util.ToUpper(fetchedUser.Role),
 	}
 
 	log.Println("✅ Login successfully");
-
 	json.NewEncoder(w).Encode(response);
 }
 

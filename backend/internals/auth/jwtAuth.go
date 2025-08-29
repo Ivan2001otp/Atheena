@@ -32,8 +32,10 @@ func GenerateNewAccessAndRefreshTokens(user entities.User) (*string, *string, er
 
 	refresh_token := GenerateRefreshToken()
 
-	// Set 1 hour as expiry of refresh token...
-	expiry, _ :=  time.Parse( time.RFC3339, time.Now().Add(1 * time.Hour).Format(time.RFC3339));
+
+	// Set 1 day as expiry of refresh token...
+	expiry, _ :=  time.Parse( time.RFC3339, time.Now().Add(24 * time.Hour).Format(time.RFC3339));
+
 	created_time,_ := util.GenerateCreateDateTime()
 
 	// Here we will have expiry of refresh token
