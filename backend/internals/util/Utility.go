@@ -4,6 +4,7 @@ import (
 	"log"
 	"sync"
 	"time"
+	"strings"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -28,6 +29,11 @@ func GenerateObjectID() primitive.ObjectID {
 
 func GenerateCreateDateTime()( time.Time, error) {
 	return time.Parse(time.RFC3339, time.Now().Format(time.RFC3339));
+}
+
+
+func ToUpper(str string) string {
+	return strings.ToUpper(str);
 }
 
 func FormatDateTime(t time.Time) string {

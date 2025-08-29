@@ -14,6 +14,7 @@ import (
 	_jwtAuth "atheena/internals/auth"
 	_mongoRepo "atheena/internals/database/mongoV2"
 	"atheena/internals/entities"
+	_util "atheena/internals/util"
 )
 
 
@@ -168,6 +169,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		"message":"success",
 		"access_token":access_token,
 		"refresh_token":refresh_token,
+		"admin": fetchedUser,
 	}
 
 	log.Println("✅ Login successfully");
@@ -253,6 +255,10 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		"access_token" : accessToken,
 		"refresh_token": refreshToken,
 		"message":"success",
+		"name":user.Name,
+		"email":user.Email,
+		"id":user.ID.Hex(),
+		"role":_util.ToUpper(user.Role),
 	}
 
 	log.Println("✅ Register successfully");
