@@ -10,16 +10,14 @@ export interface AdminRegisterRequest {
     role:Role;
 }
 
-export interface Admin {
-    name: string;
-    email:string;
-    role: string;
-}
 export interface AdminAuthResponse {
     access_token : string;
     message: string;
     refresh_token: string;
-    admin:Admin;
+    name : string;
+    email : string;
+    id : string;
+    role:string;
 }
 
 
