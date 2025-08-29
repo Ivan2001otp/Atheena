@@ -32,10 +32,11 @@ func GenerateNewAccessAndRefreshTokens(user entities.User) (*string, *string, er
 
 	refresh_token := GenerateRefreshToken()
 
-	// Set 7 days as expiry..
-	expiry, _ :=  time.Parse( time.RFC3339, time.Now().Add(7 * 24 * time.Hour).Format(time.RFC3339));
+	// Set 1 hour as expiry of refresh token...
+	expiry, _ :=  time.Parse( time.RFC3339, time.Now().Add(1 * time.Hour).Format(time.RFC3339));
 	created_time,_ := util.GenerateCreateDateTime()
 
+	// Here we will have expiry of refresh token
 	authToken := entities.AuthToken{
 		ID: util.GenerateObjectID(),
 		User_Id: user.ID,
@@ -87,8 +88,8 @@ func GenerateAccessToken(email, role string) (string ,error) {
 	claims := jwt.MapClaims{
 		util.JWT_USER_EMAIL:email,
 		util.JWT_USER_ROLE:role,
-		// Expiry time need to 7 mins, but for now setting it to 15 mins.
-		util.JWT_USER_EXPIRATION: time.Now().Add(15 * time.Minute).Unix(),
+		// Expiry time need to 7 mins, but for now setting it to 10 mins.
+		util.JWT_USER_EXPIRATION: time.Now().Add(10 * time.Minute).Unix(),
 	}
 
 	access_token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
