@@ -77,6 +77,7 @@ const RegisterPage = () => {
         
 
        navigate("/dashboard", {state : {"admin":payload}});
+
       
       } catch (error : any) {
 

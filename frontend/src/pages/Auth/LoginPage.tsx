@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import JsCookies from "js-cookie";
-
 import { useNavigate } from "react-router-dom";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+
 import toast from "react-hot-toast";
 import { LoginAdmin } from "@/service/auth.api";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/models/auth";
@@ -102,6 +103,7 @@ const LoginPage = () => {
         error:`Something went wrong while registering admin.`
       }
     )
+
   };
 
   return (

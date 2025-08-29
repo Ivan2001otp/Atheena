@@ -4,6 +4,7 @@ import { clearAuth, getAccessToken, getRefreshToken } from "./util";
 import JsCookies from "js-cookie" 
 import toast from "react-hot-toast";
 
+
 const BASE_URL = "http://localhost:8080/api/v1";
 
 const axiosInstance = axios.create({
@@ -14,6 +15,7 @@ const axiosInstance = axios.create({
 // Request interceptor to attach tokens at every request.
 axiosInstance.interceptors.request.use(
     (config)=>{
+
         const token = getAccessToken();
         
         if (token) {
@@ -99,13 +101,16 @@ export const LoginAdmin = async(
     return Promise.reject("Could not get 200 status while logging-in admin")
 }
 
+
 export const RegisterAdmin = async(
     payload:AdminRegisterRequest
 ) : Promise<AdminAuthResponse>=>{
     // post request
     const response = await axiosInstance.post(`${BASE_URL}/register`, payload);
     console.log("The status of RegisterAdmin api is ", response.status);
+
     // console.log(response);
+
 
     if (response.status == 200) {
        return response.data;
