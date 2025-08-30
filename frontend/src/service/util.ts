@@ -1,7 +1,6 @@
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/models/auth";
 import Cookies from "js-cookie";
 import {jwtDecode} from "jwt-decode";
-import toast from "react-hot-toast";
 
 interface JwtPayload {
     exp:number;

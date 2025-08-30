@@ -76,11 +76,11 @@ const RegisterPage = () => {
 
         
 
-       navigate("/dashboard", {state : {"admin":payload}});
+       navigate("/dashboard-v1/dashboard-v2", {state : {"admin":payload}});
       
       } catch (error : any) {
 
-        console.log("failure")
+        console.log("failure to register")
         console.log(error);
         
       } finally {

@@ -3,6 +3,16 @@ export type Role = "ADMIN | SUPERVISOR"
 export const ACCESS_TOKEN : string = "access_token"
 export const REFRESH_TOKEN : string = "refresh_token"
 
+export interface StandardResponse{
+    message : string;
+    success : boolean;
+}
+
+export interface AdminLogoutRequest {
+    email : string;
+    role :string;
+}
+
 export interface AdminRegisterRequest {
     name:string;
     password:string;

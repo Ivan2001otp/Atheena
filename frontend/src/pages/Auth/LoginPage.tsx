@@ -13,14 +13,13 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/models/auth";
 
 const LoginPage = () => {
   const [loading, setIsLoading] = useState(false);
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
   const navigate = useNavigate();
-
   const validate = (): boolean => {
     let isValid = true;
 
@@ -40,7 +39,7 @@ const LoginPage = () => {
     setFormData({...formData, [key]:value});
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async(e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -59,9 +58,9 @@ const LoginPage = () => {
         const res = await LoginAdmin(payload);
         console.log(res);
 
+        // 15mins
         JsCookies.set(ACCESS_TOKEN, res.access_token, {
           expires: 0.0104,
-          httpOnly: true,
           secure: true,
           sameSite: "Strict",
         });
@@ -69,10 +68,10 @@ const LoginPage = () => {
         // 1 day
         JsCookies.set(REFRESH_TOKEN, res.refresh_token, {
           expires: 1,
-          httpOnly: true,
           secure: true,
           sameSite: "Strict",
         });
+
         console.log("login success");
 
         const admin_payload = {
@@ -82,7 +81,10 @@ const LoginPage = () => {
           role: res.role,
         };
 
-        navigate("/dashboard", { state: { admin: admin_payload } });
+        toast.success("Welcome")
+
+        setTimeout(()=>navigate("/dashboard-v1/dashboard-v2", { state: { "admin": admin_payload } }), 1500);
+        //  navigate("/dashboard-v1", { state: { "admin": admin_payload } })
 
     } catch (error: any) {
         
@@ -94,14 +96,14 @@ const LoginPage = () => {
       }
     }
 
-    toast.promise(
+    await toast.promise(
       hitAdminLoginApi,
       {
         loading:"Loading...",
-        success:`Welcome, Hope you have a good day`,
-        error:`Something went wrong while registering admin.`
       }
     )
+
+    
   };
 
   return (
