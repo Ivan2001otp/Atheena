@@ -108,6 +108,7 @@ export const LoginAdmin = async (
         console.log("status is ", error)
         console.log(error)
 
+
     }
     return Promise.reject("Could not get 200 status while logging-in admin")
 };
@@ -133,22 +134,26 @@ export const LogoutAdmin = async(
     payload : AdminLogoutRequest
 ): Promise<StandardResponse>=>{
 
+
+    console.log("logout request body")
+    console.log(payload);
     try {
-        const response = await axiosInstance.post(`${BASE_URL}/logout`, {
+        const response = await axiosInstance.post(`${BASE_URL}/logout`,{}, {
             params:{
-                email : payload.email,
-                role : payload.role
-            }
+                "email" : payload.email,
+                "role" : payload.role
+            },
         });
-        console.log("The status of LoginAdmin api is ", response.status);
         console.log(response);
+        console.log("The status of LogoutAdmin api is ", response.status);
+
 
         if (response.status === 200) {
             return response.data;
         }
 
     } catch (error:any) {
-        console.log("UI - something went wrong during login")
+        console.log("UI - something went wrong during logout")
         console.log(error)
     }
     

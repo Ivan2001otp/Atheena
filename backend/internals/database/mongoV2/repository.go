@@ -290,12 +290,12 @@ func DeleteLoggedOutRefreshToken(email, role string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second);
 	defer cancel();
 
+	fmt.Printf("Email is %s, role is %s \n" , email, role);
 	result, err := collection.DeleteOne(ctx,
 		 bson.M{"email":email, "role":role}, 
 		);
 
 	log.Println("Deleted logout count : ", result.DeletedCount);
-
 	if err != nil {
 		log.Println("❌ Could not delete the Refresh token from TOKENS table.");
 		log.Println(err.Error());

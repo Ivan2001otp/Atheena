@@ -81,6 +81,13 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	email := r.URL.Query().Get("email");
 	role := r.URL.Query().Get("role");
 
+	if (len(email)==0 || len(role)==0) {
+		log.Println("❌ Email or role params are empty.");
+		http.Error(w, " Email or role params are empty.", http.StatusInternalServerError);
+
+		return;
+	}
+
 	// soft delete the user's token entry from auth-tokens.
 	err := _mongoRepo.DeleteLoggedOutRefreshToken(email, role);
 	if err != nil {
