@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import {Navigate} from "react-router-dom";
 import { getAccessToken, isTokenExpired } from '@/service/util';
 import toast from 'react-hot-toast';
@@ -10,13 +10,18 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const [isExpired, setIsExpired] = useState(false);
+  const hasShownToast = useRef(false);
 
   useEffect(() => {
+    
     const token = getAccessToken();
-    if (!token || isTokenExpired(token)) {
+
+    if (!token || isTokenExpired(token) && !hasShownToast.current) {
       setIsExpired(true);
-      toast.error("Session expired. Kindly login again");
+      hasShownToast.current = true;
+      toast.error("Session is Expired. Kindly Login Again ");
     }
+    
   }, []); // run once when component mounts
 
   if (isExpired) {
