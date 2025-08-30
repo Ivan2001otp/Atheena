@@ -108,6 +108,7 @@ export const LoginAdmin = async (
         console.log("status is ", error)
         console.log(error)
 
+
     }
     return Promise.reject("Could not get 200 status while logging-in admin")
 };
@@ -133,6 +134,7 @@ export const LogoutAdmin = async(
     payload : AdminLogoutRequest
 ): Promise<StandardResponse>=>{
 
+
     console.log("logout request body")
     console.log(payload);
     try {
@@ -144,6 +146,7 @@ export const LogoutAdmin = async(
         });
         console.log(response);
         console.log("The status of LogoutAdmin api is ", response.status);
+
 
         if (response.status === 200) {
             return response.data;

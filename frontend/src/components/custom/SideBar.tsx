@@ -1,4 +1,5 @@
 import { Navigate, NavLink } from "react-router-dom";
+
 import {
   Home,
   Boxes,
@@ -12,6 +13,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "../ui/button";
+
 import { LogoutAdmin } from "@/service/auth.api";
 import type { AdminLogoutRequest } from "@/models/auth";
 import toast from "react-hot-toast";
@@ -45,9 +47,6 @@ export default function Sidebar({ collapsed, email ,role}: SidebarProps1) {
 
 
   const handleLogout = async() => {
-   
-    console.log("email ", email)
-    console.log("role ", role);
 
     const payload : AdminLogoutRequest = {
       email:email,
