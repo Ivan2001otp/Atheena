@@ -20,6 +20,7 @@ export interface AdminRegisterRequest {
     role:Role;
 }
 
+
 export interface AdminAuthResponse {
     access_token : string;
     message: string;

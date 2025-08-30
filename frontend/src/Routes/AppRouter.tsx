@@ -1,6 +1,11 @@
 import LoginPage from "@/pages/Auth/LoginPage";
 import RegisterPage from "@/pages/Auth/RegisterPage";
+<<<<<<< HEAD
 import DashboardPage from "@/pages/Dashboard/HomePage";
+=======
+import DashboardPage from "@/pages/Dashboard/dashboardPage";
+
+>>>>>>> a37208b84aa2cd1b90f05bc3c61066ac14bf15b4
 import NotFound from "@/pages/Others/NotFound";
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
@@ -13,6 +18,7 @@ import SitesPage from "@/pages/Dashboard/SitesPage";
 import ReportPage from "@/pages/Dashboard/ReportPage";
 import ProfilePage from "@/pages/Dashboard/ProfilePage";
 import DashboardV2Page from "@/pages/Dashboard/DashboardV2Page";
+
 
 export default function AppRoutes() {
   return (
@@ -33,6 +39,7 @@ export default function AppRoutes() {
       >
 
 
+<<<<<<< HEAD
       <Route
         path="dashboard-v2"
         element = {
@@ -112,3 +119,10 @@ export default function AppRoutes() {
     </Routes>
   );
 }
+=======
+                {/* catch all  */}
+                <Route path="*" element={<NotFound/>}/>
+            </Routes>
+    )
+}
+>>>>>>> a37208b84aa2cd1b90f05bc3c61066ac14bf15b4
