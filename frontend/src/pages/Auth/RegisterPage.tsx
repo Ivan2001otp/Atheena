@@ -65,6 +65,7 @@ const RegisterPage = () => {
 
       try {
         
+        
         const res = await RegisterAdmin(payload);
         console.log(res);
 
@@ -72,17 +73,16 @@ const RegisterPage = () => {
         JsCookies.set(ACCESS_TOKEN, res.access_token, {expires: 0.0104, secure: true, sameSite: "Strict" });
         // 1 day
         JsCookies.set(REFRESH_TOKEN, res.refresh_token, {expires: 1, secure: true, sameSite: "Strict" })
+        JsCookies.set(ACCESS_TOKEN, res.access_token, {expires: 0.0104, secure: true, sameSite: "Strict" });
+        // 1 day
+        JsCookies.set(REFRESH_TOKEN, res.refresh_token, {expires: 1, secure: true, sameSite: "Strict" })
         console.log("success");
 
         
 
-<<<<<<< HEAD
-       navigate("/dashboard-v1/dashboard-v2", {state : {"admin":payload}});
-=======
-       navigate("/dashboard", {state : {"admin":payload}});
 
->>>>>>> a37208b84aa2cd1b90f05bc3c61066ac14bf15b4
-      
+       navigate("/dashboard-v1/dashboard-v2", {state : {"admin":payload}});
+
       } catch (error : any) {
 
         console.log("failure to register")

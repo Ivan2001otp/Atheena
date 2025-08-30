@@ -13,12 +13,15 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const hasShownToast = useRef(false);
 
   useEffect(() => {
+    
     const token = getAccessToken();
+
     if (!token || isTokenExpired(token) && !hasShownToast.current) {
       setIsExpired(true);
       hasShownToast.current = true;
       toast.error("Session is Expired. Kindly Login Again ");
     }
+    
   }, []); // run once when component mounts
 
   if (isExpired) {

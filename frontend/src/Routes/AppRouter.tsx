@@ -1,24 +1,19 @@
 import LoginPage from "@/pages/Auth/LoginPage";
 import RegisterPage from "@/pages/Auth/RegisterPage";
-<<<<<<< HEAD
 import DashboardPage from "@/pages/Dashboard/HomePage";
-=======
-import DashboardPage from "@/pages/Dashboard/dashboardPage";
 
->>>>>>> a37208b84aa2cd1b90f05bc3c61066ac14bf15b4
 import NotFound from "@/pages/Others/NotFound";
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import AccessDeniedPage from "@/pages/Auth/AccessDeniedPage";
+import DashboardV2Page from "@/pages/Dashboard/DashboardV2Page";
 import InventoryPage from "@/pages/Dashboard/InventoryPage";
 import WarehousePage from "@/pages/Dashboard/WarehousePage";
 import SupervisorPage from "@/pages/Dashboard/SupervisorPage";
-import TransactionPage from "@/pages/Dashboard/TransactionPage";
-import SitesPage from "@/pages/Dashboard/SitesPage";
-import ReportPage from "@/pages/Dashboard/ReportPage";
 import ProfilePage from "@/pages/Dashboard/ProfilePage";
-import DashboardV2Page from "@/pages/Dashboard/DashboardV2Page";
-
+import ReportPage from "@/pages/Dashboard/ReportPage";
+import SitesPage from "@/pages/Dashboard/SitesPage";
+import TransactionPage from "@/pages/Dashboard/TransactionPage";
 
 export default function AppRoutes() {
   return (
@@ -37,92 +32,80 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       >
+        <Route
+          path="dashboard-v2"
+          element={
+            <ProtectedRoute>
+              <DashboardV2Page />
+            </ProtectedRoute>
+          }
+        />
 
+        <Route
+          path="inventory"
+          element={
+            <ProtectedRoute>
+              <InventoryPage />
+            </ProtectedRoute>
+          }
+        />
 
-<<<<<<< HEAD
-      <Route
-        path="dashboard-v2"
-        element = {
-          <ProtectedRoute>
-              <DashboardV2Page/>
-          </ProtectedRoute>
-        }
-      />  
+        <Route
+          path="warehouses"
+          element={
+            <ProtectedRoute>
+              <WarehousePage />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="inventory"
-        element={
-          <ProtectedRoute>
-            <InventoryPage />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="supervisors"
+          element={
+            <ProtectedRoute>
+              <SupervisorPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="transactions"
+          element={
+            <ProtectedRoute>
+              <TransactionPage />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="warehouses"
-        element={
-          <ProtectedRoute>
-            <WarehousePage />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="sites"
+          element={
+            <ProtectedRoute>
+              <SitesPage />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="supervisors"
-        element={
-          <ProtectedRoute>
-            <SupervisorPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="transactions"
-        element={
-          <ProtectedRoute>
-            <TransactionPage />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="reports"
+          element={
+            <ProtectedRoute>
+              <ReportPage />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="sites"
-        element={
-          <ProtectedRoute>
-            <SitesPage />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="reports"
-        element={
-          <ProtectedRoute>
-            <ReportPage />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="profile"
-        element={
-          <ProtectedRoute>
-            <ProfilePage />
-          </ProtectedRoute>
-        }
-      />
-
+        <Route
+          path="profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
       </Route>
-      
 
       {/* catch all  */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
-=======
-                {/* catch all  */}
-                <Route path="*" element={<NotFound/>}/>
-            </Routes>
-    )
-}
->>>>>>> a37208b84aa2cd1b90f05bc3c61066ac14bf15b4

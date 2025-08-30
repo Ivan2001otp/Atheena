@@ -14,13 +14,15 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/models/auth";
 
 const LoginPage = () => {
   const [loading, setIsLoading] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [formData, setFormData] = useState({
+    
     email: "",
     password: "",
   });
 
   const navigate = useNavigate();
+
+
   const validate = (): boolean => {
     let isValid = true;
 
