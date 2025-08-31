@@ -8,12 +8,10 @@ import SideBar from "@/components/custom/SideBar";
 const HomePage = () => {
 
  const [collapsed, setCollapsed] = useState(true);
- const location = useLocation();
- const adminDetails = location.state?.admin;
 
   return (
     <div className="flex h-screen w-full">
-      <SideBar collapsed={collapsed} email={adminDetails.email} role={adminDetails.role}/>
+      <SideBar collapsed={collapsed}/>
 
       <div className="flex flex-col flex-1 transition-all duration-300">
         <div className="h-14 flex items-center px-4 shadow-md bg-white">

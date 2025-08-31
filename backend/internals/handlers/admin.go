@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	_mongo "atheena/internals/database/mongoV2"
@@ -126,6 +127,8 @@ func AddOrUpdateSupervisor(w http.ResponseWriter, r *http.Request) {
 
 
 
+
+
 // Construction Site related CRUD.
 func AddConstructionSite(w http.ResponseWriter, r *http.Request) {
 
@@ -208,6 +211,7 @@ func AddNewWarehouse(w http.ResponseWriter, r *http.Request) {
 
 	var warehouse _entities.WareHouse
 	userIdStr,ok := requestPayload["user_id"].(string)
+	log.Println("The real user_id value from frontend : ",userIdStr);
 	if (ok) {
 		warehouse.User_Id,_ = primitive.ObjectIDFromHex(userIdStr)
 	}
@@ -217,9 +221,9 @@ func AddNewWarehouse(w http.ResponseWriter, r *http.Request) {
 		warehouse.Name = nameStr;
 	}
 
-	locationStr, ok := requestPayload["location"].(string)
+	pinStr, ok := requestPayload["pin"].(string)
 	if (ok) {
-		warehouse.Location = locationStr
+		warehouse.Pin = pinStr
 	}
 
 	addressStr, ok := requestPayload["address"].(string)
@@ -237,11 +241,20 @@ func AddNewWarehouse(w http.ResponseWriter, r *http.Request) {
 		warehouse.Country = countryStr
 	}
 
-	warehouse.ID = primitive.NewObjectID()
+	idStr, ok := requestPayload["id"].(string);
+	if (ok) {
+
+		if (len(idStr)==0){
+			warehouse.ID = primitive.NewObjectID();
+		} else {
+			warehouse.ID,_ = primitive.ObjectIDFromHex(idStr);
+		}
+	}
+
+	// warehouse.ID = primitive.NewObjectID()
 	warehouse.Created_At ,_ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339));
-
-
 	err = _mongo.AddWarehouseByUser(warehouse);
+	
 	if err != nil {
 		log.Println("Something went wrong while adding new warehouse..");
 		log.Println(err.Error());
@@ -256,6 +269,30 @@ func AddNewWarehouse(w http.ResponseWriter, r *http.Request) {
 
 	_ = json.NewEncoder(w).Encode(response);
 }
+
+// get all warehouses for given admin_id
+ func GetAllWarehouseByAdminId(w http.ResponseWriter, r *http.Request) {
+	
+	if (r.Method != http.MethodGet) {
+		http.Error(w, "Only GET request", http.StatusBadRequest);
+		return;
+	}
+
+	params := mux.Vars(r);
+	adminIdStr := params["admin_id"];
+
+	var wareHouseList []_entities.WareHouse;
+	adminId,_ := primitive.ObjectIDFromHex(adminIdStr);
+
+	wareHouseList, err := _mongo.FetchWarehouseById(adminId);
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError);
+		return;
+	}
+
+	log.Println("✅ Successfully fetched warehouses for admin id", adminIdStr);
+	_ = json.NewEncoder(w).Encode(wareHouseList);
+ }
 
 
 // This function need to be revisited again.

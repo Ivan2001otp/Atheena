@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 
 import toast from "react-hot-toast";
 import { LoginAdmin } from "@/service/auth.api";
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/models/auth";
+import { ACCESS_TOKEN, ADMIN_EMAIL, ADMIN_ID, ADMIN_NAME, ADMIN_ROLE, REFRESH_TOKEN } from "@/models/auth";
 
 const LoginPage = () => {
   const [loading, setIsLoading] = useState(false);
@@ -86,8 +86,12 @@ const LoginPage = () => {
 
         toast.success("Welcome")
 
-        setTimeout(()=>navigate("/dashboard-v1/dashboard-v2", { state: { "admin": admin_payload } }), 1500);
-        //  navigate("/dashboard-v1", { state: { "admin": admin_payload } })
+        localStorage.setItem(ADMIN_EMAIL, res.email);
+        localStorage.setItem(ADMIN_NAME, res.name);
+        localStorage.setItem(ADMIN_ROLE, res.role);
+        localStorage.setItem(ADMIN_ID, res.id);
+        
+        setTimeout(()=>navigate("/atheena/dashboard-v2"), 1200);
 
     } catch (error: any) {
         

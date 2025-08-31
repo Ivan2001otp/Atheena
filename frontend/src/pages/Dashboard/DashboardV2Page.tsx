@@ -1,17 +1,14 @@
-import React from 'react'
-import { useLocation } from 'react-router-dom'
+import { ADMIN_EMAIL, ADMIN_ID, ADMIN_NAME, ADMIN_ROLE } from '@/models/auth';
 
 const DashboardV2Page = () => {
 
-  const location = useLocation();
-  const adminDetails = location.state?.admin;
   return (
     <div>
 
-       <div>{adminDetails.name}</div>
-       <div>{adminDetails.id}</div>
-       <div>{adminDetails.email}</div>
-       <div>{adminDetails.role}</div>
+       <div>{localStorage.getItem(ADMIN_NAME)}</div>
+       <div>{localStorage.getItem(ADMIN_EMAIL)}</div>
+       <div>{localStorage.getItem(ADMIN_ID)}</div>
+       <div>{localStorage.getItem(ADMIN_ROLE)}</div>
     </div>
   )
 }

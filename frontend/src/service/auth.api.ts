@@ -1,4 +1,4 @@
-import { ACCESS_TOKEN, type AdminAuthResponse, type AdminLogoutRequest, type AdminRegisterRequest, type LoginRequest, type StandardResponse } from "@/models/auth";
+import { ACCESS_TOKEN, type AddWarehouseRequest, type AdminAuthResponse, type AdminLogoutRequest, type AdminRegisterRequest, type AdminWarehouse, type LoginRequest, type StandardResponse } from "@/models/auth";
 
 import axios from "axios";
 import { clearAuth, getAccessToken, getRefreshToken } from "./util";
@@ -50,6 +50,7 @@ axiosInstance.interceptors.response.use(
         } else if (error.response?.status === 401) {
             originalRequest._retry = false;
             toast.error("Invalid Credentials");
+            window.location.href="/login";
             // window.location.href = "/access_denied";
         }
         else if (error.response?.status == 403) {
@@ -88,7 +89,6 @@ axiosInstance.interceptors.response.use(
 );
 
 
-
 export const LoginAdmin = async (
     payload: LoginRequest
 ): Promise<AdminAuthResponse> => {
@@ -111,7 +111,6 @@ export const LoginAdmin = async (
     }
     return Promise.reject("Could not get 200 status while logging-in admin")
 };
-
 
 
 export const RegisterAdmin = async(
@@ -142,7 +141,7 @@ export const LogoutAdmin = async(
                 "role" : payload.role
             },
         });
-        console.log(response);
+        // console.log(response);
         console.log("The status of LogoutAdmin api is ", response.status);
 
         if (response.status === 200) {
@@ -156,4 +155,48 @@ export const LogoutAdmin = async(
     
     return Promise.reject("Could not get 200 status while logout admin")
 
+}
+
+
+export const GetAllWarehouse = async(adminIdStr : string
+) : Promise<AdminWarehouse[]> => {
+
+
+    try {
+        const response = await axiosInstance.get(`${BASE_URL}/get_warehouses/${adminIdStr}`,)
+        console.log(response);
+
+        if (response.status === 200) {
+            return response.data;
+        }
+
+    }catch(error) { 
+        console.log("Something went wrong while fetching warehouse by admin id");
+        console.log(error);
+    }
+
+    return Promise.reject("Could not get 200 status while fetching new warehouses")
+
+}
+
+export const AddNewWarehouse = async(
+    payload : AddWarehouseRequest
+) : Promise<StandardResponse> =>{ 
+    
+    try {
+        const response = await axiosInstance.post(`${BASE_URL}/add_warehouse`, payload);
+
+        console.log(response);
+        console.log("The status of Add-Ware-house api is ", response.status);
+
+        if (response.status === 200) {
+            return response.data;
+        }
+
+
+    } catch (error) {
+        console.log("Something went wrong while adding new warehouse !");
+        console.log(error);
+    }
+       return Promise.reject("Could not get 200 status while adding new warehouse")
 }
