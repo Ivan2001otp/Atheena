@@ -10,6 +10,13 @@ import {
   WarehouseIcon,
   LogOut
 } from "lucide-react";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
 import { motion } from "framer-motion";
 import { Button } from "../ui/button";
 import { LogoutAdmin } from "@/service/auth.api";
@@ -19,7 +26,6 @@ import { clearAuth } from "@/service/util";
 
 interface SidebarProps1 {
   collapsed: boolean;
-  
 }
 
 export default function Sidebar({ collapsed}: SidebarProps1) {
@@ -104,7 +110,15 @@ export default function Sidebar({ collapsed}: SidebarProps1) {
             }
           >
             {collapsed ? (
-              <div>{item.icon}</div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                    <div>{item.icon}</div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{item.name}</p>
+                </TooltipContent>
+              </Tooltip>
+              
             ) : (
               <div className="flex space-x-4">
                 <div>{item.icon}</div>

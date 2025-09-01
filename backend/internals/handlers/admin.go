@@ -12,6 +12,7 @@ import (
 
 	_mongo "atheena/internals/database/mongoV2"
 	_entities "atheena/internals/entities"
+	// "atheena/internals/util"
 )
 
 // supervisor related CRUD.
@@ -127,7 +128,33 @@ func AddOrUpdateSupervisor(w http.ResponseWriter, r *http.Request) {
 
 
 
+// Fetch the constructions sites of the given admin id
+func FetchConstructionSitebyAdminId(w http.ResponseWriter, r *http.Request) {
 
+	if (r.Method != http.MethodGet) {
+		http.Error(w, "Only GET request", http.StatusBadRequest);
+		return;
+	}
+
+	params := mux.Vars(r);
+	adminIdStr := params["admin_id"]
+	log.Println("The admin id is ", adminIdStr);
+
+	var constructionSites []_entities.Site;
+	adminId,_ := primitive.ObjectIDFromHex(adminIdStr);
+
+	constructionSites, err := _mongo.FetchSitesbyAdminId(adminId);
+
+	if err != nil {
+		log.Println(err.Error());
+		http.Error(w, err.Error(), http.StatusInternalServerError);
+		return;
+	}
+
+
+	log.Println("✅ Successfully fetched constructions sites for admin id", adminIdStr);
+	_ = json.NewEncoder(w).Encode(constructionSites);
+}
 
 // Construction Site related CRUD.
 func AddConstructionSite(w http.ResponseWriter, r *http.Request) {
@@ -166,6 +193,13 @@ func AddConstructionSite(w http.ResponseWriter, r *http.Request) {
 	countryStr, ok := requestPayload["country"].(string)
 	if (ok) {
 		constructionSite.Country = countryStr;
+	}
+
+	adminIdStr, ok := requestPayload["user_id"].(string)
+	if (ok) {
+		fmt.Println("Admin id str is ", adminIdStr);
+		constructionSite.AdminId,_ = primitive.ObjectIDFromHex(adminIdStr)
+		fmt.Println("Admin id object id is ", constructionSite.AdminId);
 	}
 
 
@@ -271,7 +305,7 @@ func AddNewWarehouse(w http.ResponseWriter, r *http.Request) {
 }
 
 // get all warehouses for given admin_id
- func GetAllWarehouseByAdminId(w http.ResponseWriter, r *http.Request) {
+func GetAllWarehouseByAdminId(w http.ResponseWriter, r *http.Request) {
 	
 	if (r.Method != http.MethodGet) {
 		http.Error(w, "Only GET request", http.StatusBadRequest);
@@ -292,7 +326,7 @@ func AddNewWarehouse(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("✅ Successfully fetched warehouses for admin id", adminIdStr);
 	_ = json.NewEncoder(w).Encode(wareHouseList);
- }
+}
 
 
 // This function need to be revisited again.

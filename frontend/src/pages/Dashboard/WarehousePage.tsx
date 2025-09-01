@@ -103,6 +103,7 @@ const WarehousePage: React.FC = () => {
     setErrors(v);
     if (Object.keys(v).length > 0) return;
 
+    console.log("editing id is ", editingId);
     if (editingId) {
       setWarehouseList((prev) =>
         prev.map((w) =>
@@ -115,7 +116,6 @@ const WarehousePage: React.FC = () => {
                 address: form.address.trim(),
                 state: form.state.trim(),
                 pin:form.pin.trim(),
-                // user_id: localStorage.getItem(ADMIN_ID)!,
                 country: form.country.trim(),
                 created_at: formatDateTimeV2( Date.now())
               }
@@ -194,13 +194,13 @@ const WarehousePage: React.FC = () => {
     const w = warehouseList.find((item) => item.id === id);
     if (!w) return;
 
-    setEditingId(id); // editingId <- name
+    setEditingId(id); 
     setForm({
       name: w.name,
       address: w.address,
       state: w.state,
       country: w.country,
-      pin: w.pin!,
+      pin: w.pin ,
     });
 
   };

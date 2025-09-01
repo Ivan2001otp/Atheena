@@ -1,4 +1,4 @@
-import { ACCESS_TOKEN, type AddWarehouseRequest, type AdminAuthResponse, type AdminLogoutRequest, type AdminRegisterRequest, type AdminWarehouse, type LoginRequest, type StandardResponse } from "@/models/auth";
+import { ACCESS_TOKEN, type AddWarehouseRequest, type AdminAuthResponse, type AdminLogoutRequest, type AdminRegisterRequest, type AdminWarehouse, type LoginRequest, type SiteModel, type StandardResponse } from "@/models/auth";
 
 import axios from "axios";
 import { clearAuth, getAccessToken, getRefreshToken } from "./util";
@@ -158,6 +158,48 @@ export const LogoutAdmin = async(
 }
 
 
+// Construction site apis
+export const AddNewConstructionSite = async (payload: SiteModel): Promise<StandardResponse> =>{
+
+    try {
+
+        const response = await axiosInstance.post(`${BASE_URL}/add_construction_site`, payload);
+        
+        console.log(response);
+        console.log("The status of Add-Ware-house api is ", response.status);
+
+        if (response.status === 200) {
+            return response.data;
+        }
+
+    } catch (error) {
+        console.log("Something went wrong while adding new warehouse !");
+        console.log(error);
+    }
+
+    return Promise.reject("Could not get 200 status while adding new warehouse")
+
+}
+
+export const GetAllConstructionSites = async (adminIdStr:string) : Promise<SiteModel[]> => {
+
+    try {
+        const res = await axiosInstance.get(`${BASE_URL}/get_construction_sites/${adminIdStr}`)
+        console.log(res)
+
+        if (res.status ===200)return res.data;
+
+    } catch (error) {
+        console.log("Something went wrong while fetching all construction sites...");
+        console.log(error);
+    }
+
+    return Promise.reject("Could not get 200 status while fetching all construction sites.")
+
+}
+
+
+// Warehouse apis
 export const GetAllWarehouse = async(adminIdStr : string
 ) : Promise<AdminWarehouse[]> => {
 
@@ -198,5 +240,6 @@ export const AddNewWarehouse = async(
         console.log("Something went wrong while adding new warehouse !");
         console.log(error);
     }
-       return Promise.reject("Could not get 200 status while adding new warehouse")
+    
+    return Promise.reject("Could not get 200 status while adding new warehouse")
 }

@@ -3,6 +3,7 @@ package main
 import (
 	envConfig "atheena/internals/config"
 	_mongo "atheena/internals/database/mongoV2"
+	_util "atheena/internals/util"
 	"atheena/internals/handlers"
 	"atheena/internals/routers"
 	"net/http"
@@ -29,12 +30,13 @@ func setUpConfig() {
    } else {
 	log.Println("MongoDB is set up successfully !");
    }
+
+   _util.Init()
 }
 
 func main() {
    
 	setUpConfig()
-
 	// define the cors
 	corsOptions := cors.New(cors.Options{
 		AllowedMethods : []string{"GET", "DELETE", "POST", "OPTIONS", "PUT"},

@@ -7,6 +7,25 @@ export const ADMIN_NAME : string = "admin_name_credential@"
 export const ADMIN_ROLE : string = "admin_role_credential@"
 export const ADMIN_ID : string = "admin_id_credential@"
 
+export interface AddSiteRequest {
+    address:string;
+    country:string;
+    name:string;
+    state:string;
+    updated_time:string;
+    user_id:string;
+}
+
+export interface SiteModel {
+    id : string;
+    address:string;
+    country:string;
+    name:string;
+    state:string;
+    updated_time:string;
+    user_id:string;
+}
+
 
 export interface AdminWarehouse {
     id : string;

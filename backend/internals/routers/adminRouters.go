@@ -27,4 +27,5 @@ func RegisterAdminRouters(apiRouter *mux.Router) {
 	apiRouter.HandleFunc("/add_warehouse", handlers.AddNewWarehouse).Methods("POST");
 
 	apiRouter.HandleFunc("/get_warehouses/{admin_id}", handlers.GetAllWarehouseByAdminId).Methods("GET");
+	apiRouter.HandleFunc("/get_construction_sites/{admin_id}", handlers.FetchConstructionSitebyAdminId).Methods("GET");
 }
