@@ -11,46 +11,51 @@ import {
   WarehouseIcon,
   LogOut
 } from "lucide-react";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
 import { motion } from "framer-motion";
 import { Button } from "../ui/button";
 
 import { LogoutAdmin } from "@/service/auth.api";
-import type { AdminLogoutRequest } from "@/models/auth";
+import { ADMIN_EMAIL, ADMIN_ROLE, type AdminLogoutRequest } from "@/models/auth";
 import toast from "react-hot-toast";
 import { clearAuth } from "@/service/util";
 
 interface SidebarProps1 {
   collapsed: boolean;
-  email : string;
-  role : string;
 }
 
-export default function Sidebar({ collapsed, email ,role}: SidebarProps1) {
+export default function Sidebar({ collapsed}: SidebarProps1) {
   const menuItems = [
-    { name: "Dashboard", path: "/dashboard-v1/dashboard-v2", icon: <Home /> },
-    { name: "Inventory", path: "/dashboard-v1/inventory", icon: <Boxes /> },
-    { name: "Warehouses", path: "/dashboard-v1/warehouses", icon: <WarehouseIcon /> },
+    { name: "Dashboard", path: "/atheena/dashboard-v2", icon: <Home /> },
+    { name: "Inventory", path: "/atheena/inventory", icon: <Boxes /> },
+    { name: "Warehouses", path: "/atheena/warehouses", icon: <WarehouseIcon /> },
     {
       name: "Supervisors",
-      path: "/dashboard-v1/supervisors",
+      path: "/atheena/supervisors",
       icon: <Users />,
     },
     {
       name: "Transactions",
-      path: "/dashboard-v1/transactions",
+      path: "/atheena/transactions",
       icon: <ClipboardList />,
     },
-    { name: "Sites", path: "/dashboard-v1/sites", icon: <LucideConstruction /> },
-    { name: "Reports", path: "/dashboard-v1/reports", icon: <BarChart3 /> },
-    { name: "Profile", path: "/dashboard-v1/profile", icon: <User /> },
+    { name: "Sites", path: "/atheena/sites", icon: <LucideConstruction /> },
+    { name: "Reports", path: "/atheena/reports", icon: <BarChart3 /> },
+    { name: "Profile", path: "/atheena/profile", icon: <User /> },
   ];
 
 
   const handleLogout = async() => {
 
     const payload : AdminLogoutRequest = {
-      email:email,
-      role:role
+      email:(localStorage.getItem(ADMIN_EMAIL) as string) ,
+      role:(localStorage.getItem(ADMIN_ROLE) as string)
     };
 
     try {
@@ -58,7 +63,7 @@ export default function Sidebar({ collapsed, email ,role}: SidebarProps1) {
       toast.success(res.message);
       clearAuth()
 
-      setTimeout(()=>window.location.href = "/login",1400)
+      setTimeout(()=>window.location.href = "/login",1000)
       
     } catch (errro :any){
       toast.error("Something went wrong (logout) !");
@@ -104,7 +109,15 @@ export default function Sidebar({ collapsed, email ,role}: SidebarProps1) {
             }
           >
             {collapsed ? (
-              <div>{item.icon}</div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                    <div>{item.icon}</div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{item.name}</p>
+                </TooltipContent>
+              </Tooltip>
+              
             ) : (
               <div className="flex space-x-4">
                 <div>{item.icon}</div>

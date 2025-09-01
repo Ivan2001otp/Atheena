@@ -1,7 +1,7 @@
 
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
-import { ACCESS_TOKEN, REFRESH_TOKEN, type AdminRegisterRequest } from "@/models/auth";
+import { ACCESS_TOKEN, ADMIN_EMAIL, ADMIN_ID, ADMIN_NAME, ADMIN_ROLE, REFRESH_TOKEN, type AdminRegisterRequest } from "@/models/auth";
 import { RegisterAdmin } from "@/service/auth.api";
 
 import JsCookies from "js-cookie" 
@@ -80,8 +80,12 @@ const RegisterPage = () => {
 
         
 
-
-       navigate("/dashboard-v1/dashboard-v2", {state : {"admin":payload}});
+       localStorage.setItem(ADMIN_EMAIL, res.email);
+       localStorage.setItem(ADMIN_NAME, res.name);
+       localStorage.setItem(ADMIN_ROLE, res.role);
+       localStorage.setItem(ADMIN_ID, res.id);
+       
+       navigate("/atheena/dashboard-v2");
 
       } catch (error : any) {
 

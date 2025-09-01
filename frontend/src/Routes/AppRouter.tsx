@@ -25,7 +25,7 @@ export default function AppRoutes() {
 
       {/* protected routes  */}
       <Route
-        path="/dashboard-v1"
+        path="/atheena"
         element={
           <ProtectedRoute>
             <DashboardPage />

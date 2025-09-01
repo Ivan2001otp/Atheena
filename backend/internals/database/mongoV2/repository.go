@@ -40,6 +40,7 @@ func UpsertNewConstructionSiteesByAdmin(constructionSite _entities.Site) error {
             "address": constructionSite.Address,
             "state":   constructionSite.State,
             "country": constructionSite.Country,
+			"user_id":constructionSite.AdminId,
             "updated_time":    constructionSite.Updated_At,
         },
 	}
@@ -53,12 +54,40 @@ func UpsertNewConstructionSiteesByAdmin(constructionSite _entities.Site) error {
     }
 
     if result.MatchedCount > 0 {
-        log.Println("Construction site updated successfully")
+        log.Println("✅✅Construction site updated successfully")
     } else if result.UpsertedCount > 0 {
-        log.Println("New construction site inserted with ID:", result.UpsertedID)
+        log.Println("✅New construction site inserted with ID:", result.UpsertedID)
     }
 
     return nil
+}
+
+func FetchSitesbyAdminId(adminId primitive.ObjectID) ([]_entities.Site, error) {
+	mongoDb, err:= GetMongoClient()
+	handleDBConnection(err)
+
+	collection := mongoDb.Database(_util.DATABASE).Collection(_util.SITES);
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	defer cancel();
+
+
+	filter := bson.M{"user_id":adminId};
+	cursor, err := collection.Find(ctx, filter);
+
+	if (err != nil) {
+		log.Println("something went wrong while fetching all wareshouses for the given adminId");
+		return nil, err;
+	}
+
+	defer cursor.Close(ctx);
+
+	var siteList [] _entities.Site;
+	if err = cursor.All(ctx, &siteList); err != nil {
+		log.Println("something went wrong while parsing construction sites list.");
+		return nil, err;
+	}
+
+	return siteList,nil;
 }
 
 
@@ -76,12 +105,12 @@ func AddWarehouseByUser(warehouse _entities.WareHouse) error {
 	defer cancel();
 
 	
-	filter:=bson.M{"user_id":warehouse.ID}
+	filter:=bson.M{"_id":warehouse.ID}
 	update := bson.M{
 		"$set" : bson.M{
-			 "user_id":    warehouse.User_Id,
+			"user_id":    warehouse.User_Id,
             "name":       warehouse.Name,
-            "location":   warehouse.Location,
+            "pin":   warehouse.Pin,
             "address":    warehouse.Address,
             "state":      warehouse.State,
             "country":    warehouse.Country,
@@ -105,6 +134,33 @@ func AddWarehouseByUser(warehouse _entities.WareHouse) error {
 	return nil;
 }
 
+func FetchWarehouseById(adminId primitive.ObjectID) ([] _entities.WareHouse, error) {
+	mongoDb, err:= GetMongoClient()
+	handleDBConnection(err)
+
+	collection := mongoDb.Database(_util.DATABASE).Collection(_util.WAREHOUSES);
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	defer cancel();
+
+
+	filter := bson.M{"user_id":adminId};
+	cursor, err := collection.Find(ctx, filter);
+
+	if (err != nil) {
+		log.Println("something went wrong while fetching all wareshouses for the given adminId");
+		return nil, err;
+	}
+
+	defer cursor.Close(ctx);
+
+	var warehouseList [] _entities.WareHouse;
+	if err = cursor.All(ctx, &warehouseList); err != nil {
+		log.Println("something went wrong while parsing warehouse list.");
+		return nil, err;
+	}
+
+	return warehouseList,nil;
+}
 
 func DeleteWarehouseById(warehouseId primitive.ObjectID) error {
 	// mongoDb, err := GetMongoClient();
