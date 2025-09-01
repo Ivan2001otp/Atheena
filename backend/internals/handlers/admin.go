@@ -128,6 +128,25 @@ func AddOrUpdateSupervisor(w http.ResponseWriter, r *http.Request) {
 
 
 
+// Adding inventory item to a particular warehouse id.
+func AddInventoryItem(w http.ResponseWriter, r *http.Request) {
+
+	if (r.Method != http.MethodPost) {
+		http.Error(w, "Only POST request", http.StatusBadRequest);
+		return;
+	}
+
+	var inventoryItem 	_entities.InventoryItem;
+	err := json.NewDecoder(r.Body).Decode(&inventoryItem)
+	
+	if err != nil {
+		log.Println(err.Error());
+		log.Println("Something went wrong while parsing the rquest body..")
+	}	
+}
+
+
+
 // Fetch the constructions sites of the given admin id
 func FetchConstructionSitebyAdminId(w http.ResponseWriter, r *http.Request) {
 
