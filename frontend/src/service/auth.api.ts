@@ -51,9 +51,8 @@ axiosInstance.interceptors.response.use(
             originalRequest._retry = false;
             toast.error("Invalid Credentials");
             window.location.href="/login";
-            // window.location.href = "/access_denied";
         }
-        else if (error.response?.status == 403) {
+        else if (error.response?.status === 403) {
             originalRequest._retry = false;
             console.log("Setting retry to false : ", originalRequest._retry);
             const cookie_refresh_token = getRefreshToken()
@@ -66,7 +65,8 @@ axiosInstance.interceptors.response.use(
 
                     const res = await axiosInstance.post("/refresh-token", payload);
                     console.log(res);
-                    JsCookies.set(ACCESS_TOKEN, res.data.access_token, { expires: 0.0104, secure: true, sameSite: "Strict" });
+                    JsCookies.set(ACCESS_TOKEN, res.data.access_token, 
+                        { expires: 0.0104, secure: true, sameSite: "Strict" });
 
 
                     originalRequest.headers["Authorization"] = `Bearer ${res.data.access_token}`;

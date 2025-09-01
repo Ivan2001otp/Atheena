@@ -10,16 +10,14 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const [isExpired, setIsExpired] = useState(false);
-  const hasShownToast = useRef(false);
 
   useEffect(() => {
     
     const token = getAccessToken();
-
-    if (!token || isTokenExpired(token) && !hasShownToast.current) {
+    if (!token || isTokenExpired(token)) {
       setIsExpired(true);
-      hasShownToast.current = true;
-      toast.error("Session is Expired. Kindly Login Again ");
+      toast.dismiss()
+      toast.error("Session is Expired. Kindly Login Again");
     }
     
   }, []); // run once when component mounts
