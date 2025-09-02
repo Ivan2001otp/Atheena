@@ -3,14 +3,19 @@ package main
 import (
 	envConfig "atheena/internals/config"
 	_mongo "atheena/internals/database/mongoV2"
-	_util "atheena/internals/util"
+	_websockets "atheena/internals/database/websockets"
+	_websocketH "atheena/internals/handlers"
+	
 	"atheena/internals/handlers"
 	"atheena/internals/routers"
-	"net/http"
+
+	_util "atheena/internals/util"
+	"encoding/json"
 	"log"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
-	"encoding/json"
 )
 
 
@@ -35,7 +40,8 @@ func setUpConfig() {
 }
 
 func main() {
-   
+	hub:= _websockets.GetSocketHub()
+	
 	setUpConfig()
 	// define the cors
 	corsOptions := cors.New(cors.Options{
@@ -45,10 +51,15 @@ func main() {
 		AllowedOrigins: []string{"http://localhost:5173"},
 	})
 
-
+	
 	// establish routers
 	mainRouter := mux.NewRouter()
 
+
+	// websocket
+	mainRouter.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		_websocketH.ServeWs(hub, w, r)
+	})
 
 	// Custom Handle 404 error .
 	mainRouter.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
@@ -70,11 +81,12 @@ func main() {
 	exitRouters := mainRouter.PathPrefix("/api/v1").Subrouter();
 
 	adminRouters := mainRouter.PathPrefix("/api/v1").Subrouter();
+	supervisorRouters := mainRouter.PathPrefix("/api/v1").Subrouter();
 
 	routers.RegisterCommonRouters(commonRouters);
 	routers.RegisterAuthExitRouters(exitRouters);
 	routers.RegisterAdminRouters(adminRouters);
-
+	routers.RegisterSupervisorRouters(supervisorRouters);
 
 	// setting cors options
 	handler := corsOptions.Handler(mainRouter)

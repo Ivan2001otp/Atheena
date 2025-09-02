@@ -9,7 +9,7 @@ type InventoryItem struct {
 	ID primitive.ObjectID `json:"_id" bson:"_id"`
 	Warehouse_Id primitive.ObjectID `json:"warehouse_id" bson:"warehouse_id"`
 	Name string `json:"name" bson:"name"`
-	Quantity int `json:"quantity" bson:"quantity"`
+	Quantity float64 `json:"quantity" bson:"quantity"`
 	Unit string `json:"unit" bson:"unit"`
 	Reason string `json:"reason" bson:"reason"`
 	Created_At time.Time `json:"created_at" bson:"created_at"`

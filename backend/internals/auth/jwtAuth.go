@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"time"
+
 	"github.com/dgrijalva/jwt-go"
 )
 
@@ -18,11 +19,10 @@ func GenerateRefreshToken() string {
 }
 
 
-
 // access_token, refresh_token, error, http_status (Generates new tokens and inserts new user)
 func GenerateNewAccessAndRefreshTokens(user entities.User) (*string, *string, error, int){
 
-	access_token , err := GenerateAccessToken(user.Email, user.Role);
+	access_token , err := generateAccessToken(user.Email, user.Role, user.ID.Hex());
 
 	if err != nil {
 		log.Println("Something went wrong, when access_token was generated !");
@@ -74,7 +74,7 @@ func RenewAccessToken(refreshToken string) (*string, error, int) {
 		return nil, fmt.Errorf("expired token"), http.StatusForbidden;
 	}
 
-	newAccessToken, err := GenerateAccessToken(authToken.Email, authToken.Role)
+	newAccessToken, err := generateAccessToken(authToken.Email, authToken.Role, authToken.User_Id.Hex())
 	if err != nil {
 		log.Println("Something went wrong while getting new access tokens.");
 		log.Println(err.Error());
@@ -84,12 +84,13 @@ func RenewAccessToken(refreshToken string) (*string, error, int) {
 	return &newAccessToken, nil, http.StatusOK;
 }
 
-func GenerateAccessToken(email, role string) (string ,error) {
+func generateAccessToken(email, role , userID string) (string ,error) {
 	log.Println("Generating access tokens...")
 
 	claims := jwt.MapClaims{
 		util.JWT_USER_EMAIL:email,
 		util.JWT_USER_ROLE:role,
+		util.JWT_USER_ID : userID,
 		// Expiry time need to 7 mins, but for now setting it to 10 mins.
 		util.JWT_USER_EXPIRATION: time.Now().Add(10 * time.Minute).Unix(),
 	}

@@ -65,6 +65,7 @@ func TokenMiddleware(next http.Handler) http.Handler {
 			claims := token.Claims.(jwt.MapClaims)
 			ctx := context.WithValue(r.Context(), "email", claims["email"]);
 			ctx = context.WithValue(ctx, "role", claims["role"]);
+			ctx = context.WithValue(ctx, "user_id", claims["user_id"]);
 			next.ServeHTTP(w, r.WithContext(ctx));
 		});
 }

@@ -106,7 +106,6 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("✅ Logout action successful");
 
 	_= json.NewEncoder(w).Encode(response)
-
 }
 
 // Login with email and Password

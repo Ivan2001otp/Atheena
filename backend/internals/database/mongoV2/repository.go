@@ -171,6 +171,44 @@ func DeleteWarehouseById(warehouseId primitive.ObjectID) error {
 }
 
 
+func AddNewInventoryItems(inventoryItem _entities.InventoryItem) error {
+	mongoDb, err := GetMongoClient();
+	handleDBConnection(err);
+
+	collection := mongoDb.Database(_util.DATABASE).Collection(_util.INVENTORY);
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second);
+	defer cancel();
+	
+	filter := bson.M{"_id":inventoryItem.ID}
+	update := bson.M{
+		"$set" : bson.M{
+			"warehouse_id":inventoryItem.Warehouse_Id,
+			"name":inventoryItem.Name,
+			"quantity":inventoryItem.Quantity,
+			"unit":inventoryItem.Unit,
+			"reason":inventoryItem.Reason,
+			"created_at":inventoryItem.Created_At,
+			"updated_at":inventoryItem.Updated_At,
+		},
+	}
+
+
+	opts := options.Update().SetUpsert(true)
+	result, err := collection.UpdateOne(ctx, filter, update, opts)
+	if (err != nil) {
+		log.Println("❌Could not upsert the inventory Item.")
+	}
+
+	if result.MatchedCount > 0 {
+		log.Println("✅Supervisor Upserted successfully")
+	} else if result.UpsertedCount > 0 {
+		log.Println("✅Supervisor Inserted successfully")
+	}
+	
+	return nil;
+}
+
+
 // Supervisor level CRUD
 func UpsertNewSupervisor(supervisor _entities.Supervisor) error {
 	mongoDb, err := GetMongoClient();
