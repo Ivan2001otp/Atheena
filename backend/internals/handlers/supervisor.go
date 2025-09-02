@@ -24,7 +24,7 @@ func AskForApproval(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&request);
 	if err != nil {
 		log.Println(err.Error());
-		log.Println("Failed to parse the request body.");
+		log.Println("❌Failed to parse the request body.");
 		return;
 	}
 
@@ -76,8 +76,8 @@ func AskForApproval(w http.ResponseWriter, r *http.Request) {
 
 	payload.CreatedAt,_ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339));
 
-    //log.Println(payload)
-
 	hub:= _websockets.GetSocketHub()
 	hub.SendToUser(payload.AdminID, &payload);
+
+
 }

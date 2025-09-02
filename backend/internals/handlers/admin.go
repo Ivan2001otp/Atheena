@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -27,7 +28,7 @@ func DeleteSupervisor(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&requestPayload)
 
 	if err != nil {
-		log.Println("could not parse request body to delete supervisor")
+		log.Println("❌could not parse request body to delete supervisor")
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -46,7 +47,7 @@ func DeleteSupervisor(w http.ResponseWriter, r *http.Request) {
 
 	err = _mongo.DeleteSupervisor(superVisorId, adminId)
 	if err != nil {
-		log.Println("Something went wrong while deleting supervisor")
+		log.Println("❌Something went wrong while deleting supervisor")
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -110,7 +111,7 @@ func AddOrUpdateSupervisor(w http.ResponseWriter, r *http.Request) {
 
 	err = _mongo.UpsertNewSupervisor(supervisor)
 	if err != nil {
-		log.Println("Something wrong happened while upserting supervisor")
+		log.Println("❌Something wrong happened while upserting supervisor")
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -137,7 +138,9 @@ func AddInventoryItem(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println(err.Error())
-		log.Println("Something went wrong while parsing the rquest body..")
+		log.Println("❌Something went wrong while parsing the rquest body..")
+		http.Error(w, err.Error(), http.StatusInternalServerError);
+		return;
 	}
 
 	log.Println("inventory payload")
@@ -232,7 +235,7 @@ func AddConstructionSite(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&requestPayload)
 	if err != nil {
-		log.Println("Something went wrong while parsing request body...")
+		log.Println("❌Something went wrong while parsing request body...")
 		log.Println(err.Error())
 		return
 	}
@@ -269,7 +272,7 @@ func AddConstructionSite(w http.ResponseWriter, r *http.Request) {
 
 	err = _mongo.UpsertNewConstructionSiteesByAdmin(constructionSite)
 	if err != nil {
-		log.Println("Failed to upsert the construction site record")
+		log.Println("❌Failed to upsert the construction site record")
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -295,7 +298,7 @@ func AddNewWarehouse(w http.ResponseWriter, r *http.Request) {
 	var requestPayload map[string]interface{}
 	err := json.NewDecoder(r.Body).Decode(&requestPayload)
 	if err != nil {
-		log.Println("Could not parse warehouse request body.")
+		log.Println("❌Could not parse warehouse request body.")
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -348,7 +351,7 @@ func AddNewWarehouse(w http.ResponseWriter, r *http.Request) {
 	err = _mongo.AddWarehouseByUser(warehouse)
 
 	if err != nil {
-		log.Println("Something went wrong while adding new warehouse..")
+		log.Println("❌Something went wrong while adding new warehouse..")
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -400,7 +403,7 @@ func RemoveWarehouse(w http.ResponseWriter, r *http.Request) {
 	err := _mongo.DeleteWarehouseById(warehouseId)
 
 	if err != nil {
-		log.Println("Something went wrong while deleting warehouse.")
+		log.Println("❌Something went wrong while deleting warehouse.")
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -412,4 +415,110 @@ func RemoveWarehouse(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_ = json.NewEncoder(w).Encode(response)
+}
+
+
+// Order Tracking handlers 
+func InteractOrderApproval(w http.ResponseWriter, r *http.Request) {
+	// It will use admin_id, approval_id, updated_status
+
+	if (r.Method != http.MethodGet) {
+		log.Println("Only GET request allowed.")
+		http.Error(w, "Only GET request allowed.", http.StatusBadRequest);
+		return;
+	}
+
+	admin_id_str := r.URL.Query().Get("admin_id");
+	adminId,_ := primitive.ObjectIDFromHex(admin_id_str);
+
+	approval_id_str :=  r.URL.Query().Get("approval_id");
+	approvalId,_ := primitive.ObjectIDFromHex(approval_id_str);
+
+	updated_status := r.URL.Query().Get("updated_status");
+	supply_id_str := r.URL.Query().Get("supply_id");
+	supplyId, _ := primitive.ObjectIDFromHex(supply_id_str);
+
+	supervisor_id_str := r.URL.Query().Get("supervisor_id");
+	supervisorId, _ := primitive.ObjectIDFromHex(supervisor_id_str);
+
+	from_warehouse_id_str := r.URL.Query().Get("from_warehouse_id");
+	fromWareHouseID, _ := primitive.ObjectIDFromHex(from_warehouse_id_str); 
+
+	to_warehouse_id_str := r.URL.Query().Get("to_warehouse_id");
+	toWareHouseID,_ := primitive.ObjectIDFromHex(to_warehouse_id_str);
+
+	site_id_str := r.URL.Query().Get("site_id");
+	var siteID primitive.ObjectID;
+	if site_id_str == "" {
+		siteID = primitive.NilObjectID;
+	}else {siteID,_ = primitive.ObjectIDFromHex(site_id_str);}
+
+	log_type_str := r.URL.Query().Get("log_type");
+	updated_time,_ := time.Parse(time.RFC3339, time.Now().Format(time.RFC3339));
+
+	quantity := r.URL.Query().Get("quantity")
+	quantityF64, _ := strconv.ParseFloat(quantity, 64);
+
+	inventory_id_str := r.URL.Query().Get("inventory_id");
+	inventoryId, _ := primitive.ObjectIDFromHex(inventory_id_str);
+
+	material_name := r.URL.Query().Get("material");
+	unit := r.URL.Query().Get("unit");
+
+	var logRecord _entities.CustomLog
+	logRecord.ID = primitive.NewObjectID()
+	logRecord.AdminId = adminId
+	logRecord.Site_Id = siteID;
+	logRecord.SupplyID = supplyId;
+	logRecord.Supervisor_ID = supervisorId;
+	logRecord.From_Warehouse_Id = fromWareHouseID;
+	logRecord.To_Warehouse_Id = toWareHouseID;
+	logRecord.Log_Type = _entities.LogType(log_type_str);
+	logRecord.Updated = updated_time;
+
+	
+	// update the status of approval-record
+	err := _mongo.UpdateApprovalStatus(approvalId, updated_status);
+	if err != nil {
+		log.Println(err.Error());
+		http.Error(w, err.Error(), http.StatusInternalServerError);
+		return;
+	}
+
+	// add / update the log-record.
+	err = _mongo.UpsertLog(logRecord);
+	if err != nil {
+		log.Println(err.Error());
+		log.Println("Something went wrong while upserting the log record.");
+		http.Error(w, "Something went wrong while upserting the log record.", http.StatusInternalServerError);
+		return;
+	}
+	
+	if (updated_status != "approved") {
+		_ = json.NewEncoder(w).Encode(map[string]interface{}{
+			"message":fmt.Sprintf("The request for material transit is %s", updated_status),
+			"success":false,
+		});
+
+		return;
+	}
+
+	// update the inventory
+	err = _mongo.UpdateInventoryQuantity(fromWareHouseID, inventoryId, quantityF64);
+	if err != nil {
+		log.Println(err.Error());
+		log.Println("Something went wrong while updating inventory quantity.");
+		http.Error(w, err.Error(), http.StatusInternalServerError);
+		return;
+	}
+
+	// create the order when status is approved.
+	// log_type_str and order_type_str are same.
+	err = _mongo.CreateOrderRecord(logRecord.ID, quantityF64, log_type_str, material_name, unit);
+	if (err != nil) {
+		log.Println(err.Error());
+		log.Println("❌Something went wrong while creating order.");
+		http.Error(w, err.Error(), http.StatusInternalServerError);
+		return;
+	}
 }

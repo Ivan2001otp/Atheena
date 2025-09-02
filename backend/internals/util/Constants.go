@@ -15,7 +15,7 @@ var DATABASE string = "ATHEENA"
 
 // collection name
 var USERS string  = "USERS"
-
+var APPROVALS string = "APPROVALS"
 var SUPERVISORS string = "SUPERVISORS"
 var INVENTORY string = "INVENTORIES"
 var TOKENS string = "TOKENS";

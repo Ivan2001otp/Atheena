@@ -30,13 +30,13 @@ func getUserIdFromContext(ctx context.Context) primitive.ObjectID {
 	userIdStr, ok := ctx.Value("user_id").(string)
 
 	if !ok {
-		log.Println("Failed to get user_id from context. Seems to be its not string datatype");
+		log.Println("❌Failed to get user_id from context. Seems to be its not string datatype");
 		return primitive.NilObjectID
 	}
 
 	userID, err := primitive.ObjectIDFromHex(userIdStr)
 	if err != nil {
-		log.Printf("Failed to convert user_id to ObjectID: %v", err);
+		log.Printf("❌Failed to convert user_id to ObjectID: %v", err);
 		return primitive.NilObjectID;
 	}
 

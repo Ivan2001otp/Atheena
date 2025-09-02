@@ -30,4 +30,7 @@ func RegisterAdminRouters(apiRouter *mux.Router) {
 	apiRouter.HandleFunc("/get_construction_sites/{admin_id}", handlers.FetchConstructionSitebyAdminId).Methods("GET");
 
 	apiRouter.HandleFunc("/add_inventory", handlers.AddInventoryItem).Methods("POST");
+
+	// order tracking system endpoints
+	apiRouter.HandleFunc("/approve_order", handlers.InteractOrderApproval).Methods("GET");
 }

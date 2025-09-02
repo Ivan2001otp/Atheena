@@ -17,7 +17,7 @@ type CustomLog struct {
 	AdminId primitive.ObjectID `json:"admin_id" bson:"admin_id"`
 	SupplyID primitive.ObjectID `json:"supply_id" bson:"supply_id"`// f.k
 
-	SupervisorID primitive.ObjectID `json:supervisor_id" bson:"supervisor_id"`
+	Supervisor_ID primitive.ObjectID `json:supervisor_id" bson:"supervisor_id"`
 	From_Warehouse_Id primitive.ObjectID `json:"from_warehouse_id"  bson:"from_warehouse_id"`
 	To_Warehouse_Id primitive.ObjectID `json:"to_warehouse_id" bson:"to_warehouse_id"`
 	
