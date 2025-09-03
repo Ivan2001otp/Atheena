@@ -242,6 +242,7 @@ func UpdateFinalOrderStatus(status string, materialName string, orderId primitiv
 
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
+	
 	session, err := mongoDb.StartSession()
 	if err != nil {
 		log.Println("Failed to start session for mongo transation (UpdateFinalOrderStatus)")
@@ -265,12 +266,12 @@ func UpdateFinalOrderStatus(status string, materialName string, orderId primitiv
 		updated_time, _ := time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 
 		tracker := bson.M{
-			"order_status": status,
+			"order_status": _entities.OrderStatus(status),
 			"created_time": updated_time,
 		}
 
 		update := bson.M{
-			"$set": bson.M{"current_status": status, "updated_time": updated_time},
+			"$set": bson.M{"current_status": _entities.OrderStatus(status), "updated_time": updated_time},
 			"$push": bson.M{
 				"trackers": tracker,
 			},
@@ -282,6 +283,7 @@ func UpdateFinalOrderStatus(status string, materialName string, orderId primitiv
 			log.Println("Failed to update the order status")
 			return nil, err
 		}
+		log.Println("Updated the order successfully ✅ ");
 
 		// get the order quantity
 		var order _entities.Order
@@ -291,6 +293,7 @@ func UpdateFinalOrderStatus(status string, materialName string, orderId primitiv
 			log.Println(err.Error())
 			return nil, err
 		}
+		log.Println("Fetched order successfully ✅ ");
 
 		var customLog _entities.CustomLog
 		err = logCollection.FindOne(ctx, bson.M{"_id": order.Log_ID}).Decode(&customLog)
@@ -299,6 +302,8 @@ func UpdateFinalOrderStatus(status string, materialName string, orderId primitiv
 			log.Println("Failed to fetch logs.")
 			return nil, err
 		}
+		log.Println("Fetched the logs ✅ ");
+
 
 		// update the inventory of target site/warehouse.
 		if siteID == primitive.NilObjectID {
@@ -312,7 +317,7 @@ func UpdateFinalOrderStatus(status string, materialName string, orderId primitiv
 
 			update = bson.M{
 				"$inc": bson.M{
-					"quantity": -order.Quantity,
+					"quantity": order.Quantity,
 				},
 				"$set": bson.M{
 					"updated_at": updated_time,
@@ -325,11 +330,11 @@ func UpdateFinalOrderStatus(status string, materialName string, orderId primitiv
 				log.Println("Failed to update inventory of target warehouse.")
 				return nil, err
 			}
+			log.Println("✅ Updated the inventory at warehouse.");
 		} else {
 			// update the quantity of site.
 
 			// fetch the admin id from log_id
-
 			updated_time, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 
 			// update on material collection.
@@ -352,9 +357,6 @@ func UpdateFinalOrderStatus(status string, materialName string, orderId primitiv
 					"name":         materialName,
 					"admin_id":     customLog.AdminId,
 					"site_id":      siteID,
-					"quantity":     order.Quantity, // set starting value if new
-					"unit":         order.Unit,
-					"updated_time": updated_time,
 				},
 			}
 
@@ -365,6 +367,7 @@ func UpdateFinalOrderStatus(status string, materialName string, orderId primitiv
 				log.Println(err.Error())
 				return nil, fmt.Errorf("failed to upsert material: %v", err)
 			}
+			log.Println("✅ Updated the inventory at construction site.");
 		}
 
 		// update approval status to completed.
@@ -393,11 +396,13 @@ func UpdateFinalOrderStatus(status string, materialName string, orderId primitiv
 		}
 
 		if res.ModifiedCount > 0 {
-			log.Println("Updated the approval successfully")
+			log.Println("Updated the approval successfully")			
 		}
 
 		return nil, nil
 	}
+
+	
 
 	_, err = session.WithTransaction(ctx, callback)
 	return err

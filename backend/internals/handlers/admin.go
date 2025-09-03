@@ -435,8 +435,7 @@ func InteractOrderApproval(w http.ResponseWriter, r *http.Request) {
 	approvalId,_ := primitive.ObjectIDFromHex(approval_id_str);
 
 	updated_status := r.URL.Query().Get("updated_status");
-	supply_id_str := r.URL.Query().Get("supply_id");
-	supplyId, _ := primitive.ObjectIDFromHex(supply_id_str);
+	
 
 	supervisor_id_str := r.URL.Query().Get("supervisor_id");
 	supervisorId, _ := primitive.ObjectIDFromHex(supervisor_id_str);
@@ -469,7 +468,7 @@ func InteractOrderApproval(w http.ResponseWriter, r *http.Request) {
 	logRecord.ID = primitive.NewObjectID()
 	logRecord.AdminId = adminId
 	logRecord.Site_Id = siteID;
-	logRecord.SupplyID = supplyId;
+	logRecord.SupplyID = inventoryId;
 	logRecord.Supervisor_ID = supervisorId;
 	logRecord.From_Warehouse_Id = fromWareHouseID;
 	logRecord.To_Warehouse_Id = toWareHouseID;
