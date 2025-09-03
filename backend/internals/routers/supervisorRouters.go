@@ -15,4 +15,7 @@ func RegisterSupervisorRouters(apiRouter *mux.Router) {
 
 	
 	apiRouter.HandleFunc("/send_approval", handlers.AskForApproval).Methods("POST");
+	apiRouter.HandleFunc("/follow_up_order_v1", handlers.UpdateOrderApproval).Methods("POST");
+	apiRouter.HandleFunc("/follow_up_order_v2", handlers.UpdateFinalOrderApproval).Methods("POST");
+
 }

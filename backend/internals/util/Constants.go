@@ -21,5 +21,7 @@ var INVENTORY string = "INVENTORIES"
 var TOKENS string = "TOKENS";
 var WAREHOUSES string = "WAREHOUSES"
 var SITES string = "SITES";
-
+var LOGS string = "LOGS";
+var ORDERS string = "ORDERS"
+var MATERIALS string = "MATERIALS";
 

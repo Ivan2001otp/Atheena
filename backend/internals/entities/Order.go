@@ -34,6 +34,7 @@ type Order struct {
 	Quantity float64 `json:"quantity" bson:"quantity"`
 	Unit string `json:"unit" bson:"unit"`
 	Type OrderType `json:"order_type" bson:"order_type"`
+	Current_Status OrderStatus `json:"current_status" bson:"current_type"`
 	Updated_Time time.Time `json:"updated_time" bson:"updated_time"`
 	Order_Trackers []OrderTracker `json:"trackers" bson:"trackers"`
 }

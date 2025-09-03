@@ -495,15 +495,16 @@ func InteractOrderApproval(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	if (updated_status != "approved") {
+		w.WriteHeader(http.StatusOK);
 		_ = json.NewEncoder(w).Encode(map[string]interface{}{
 			"message":fmt.Sprintf("The request for material transit is %s", updated_status),
-			"success":false,
+			"success":true,
 		});
 
 		return;
 	}
 
-	// update the inventory
+	// update the inventory of source.
 	err = _mongo.UpdateInventoryQuantity(fromWareHouseID, inventoryId, quantityF64);
 	if err != nil {
 		log.Println(err.Error());
@@ -521,4 +522,10 @@ func InteractOrderApproval(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError);
 		return;
 	}
+
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"message":"Order created successfully",
+		"success":true,
+	});
+	log.Println("✅ Order created successfully.");
 }

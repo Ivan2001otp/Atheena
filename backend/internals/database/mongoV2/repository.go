@@ -38,7 +38,6 @@ func UpsertNewApproval(approvalNotification _entities.ApprovalTypeNotification) 
 			"provider_id":    approvalNotification.ProviderID,
 			"admin_id":       approvalNotification.AdminID,
 			"supply_id":      approvalNotification.SupplyID,
-			"order_id":       approvalNotification.OrderID,
 			"from_id":        approvalNotification.FromID,
 			"destination_id": approvalNotification.DestinationID,
 			"reason":         approvalNotification.Reason,
@@ -298,6 +297,31 @@ func DeleteSupervisor(supervisorID primitive.ObjectID, adminID primitive.ObjectI
 	}
 
 	return nil
+}
+
+func FetchSupervisorById(supervisorID primitive.ObjectID) (*_entities.Supervisor,error) {
+	mongoDb, err := GetMongoClient()
+	handleDBConnection(err)
+
+	collection := mongoDb.Database(_util.DATABASE).Collection(_util.SUPERVISORS)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	defer cancel()
+
+	filter := bson.M{
+		"_id":supervisorID,
+	}
+
+	var supervisor _entities.Supervisor
+	err = collection.FindOne(ctx, filter).Decode(&supervisor);
+	if err != nil {
+		log.Println("Something went wrong while fetching supervisor.");
+		log.Println(err.Error());
+		return nil,err;
+	}
+
+	log.Println("Successfully fetched supervisor.");
+	return &supervisor, nil;
 }
 
 // Admin level CRUD and token operations

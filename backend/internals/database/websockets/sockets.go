@@ -207,8 +207,8 @@ func (h *Hub) BroadcastNotification(notification *_entities.ApprovalTypeNotifica
 }
 
 
-func (h *Hub) SendToUser(userID primitive.ObjectID, notification *_entities.ApprovalTypeNotification) {
-	message := WebSocketMessage{
+func (h *Hub) SendToUser(userID primitive.ObjectID, notification interface{}) {
+	message := WebSocketMessage{								// *_entities.ApprovalTypeNotification
 		Type: _util.APPROVAL_NOTIFICATION,
 		Payload: notification,
 	}
