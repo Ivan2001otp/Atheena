@@ -20,12 +20,19 @@ func RegisterAdminRouters(apiRouter *mux.Router) {
 		return middleware.TokenMiddleware(handler);
 	})
 
-	apiRouter.HandleFunc("/upsert_superviAddWarehouseByUsersor",handlers.AddOrUpdateSupervisor).Methods("POST");
+	apiRouter.HandleFunc("/upsert_supervisor",handlers.AddOrUpdateSupervisor).Methods("POST");
 	apiRouter.HandleFunc("/delete_supervisor", handlers.DeleteSupervisor).Methods("POST");
+	apiRouter.HandleFunc("/get_supervisors", handlers.FetchAllSupervisor).Methods("GET");
 
 	apiRouter.HandleFunc("/add_construction_site", handlers.AddConstructionSite).Methods("POST");
 	apiRouter.HandleFunc("/add_warehouse", handlers.AddNewWarehouse).Methods("POST");
 
 	apiRouter.HandleFunc("/get_warehouses/{admin_id}", handlers.GetAllWarehouseByAdminId).Methods("GET");
 	apiRouter.HandleFunc("/get_construction_sites/{admin_id}", handlers.FetchConstructionSitebyAdminId).Methods("GET");
+
+	apiRouter.HandleFunc("/add_inventory", handlers.AddInventoryItem).Methods("POST");
+	apiRouter.HandleFunc("/get_inventory", handlers.FetchInventoryByWarehouse).Methods("GET");
+
+	// order tracking system endpoints
+	apiRouter.HandleFunc("/approve_order", handlers.InteractOrderApproval).Methods("GET");
 }

@@ -103,7 +103,7 @@ export default function Sidebar({ collapsed}: SidebarProps1) {
             key={item.name}
             to={item.path}
             className={({ isActive }) =>
-              `block px-4 py-3 rounded hover:bg-blue-600 transistion ${
+              `block px-4 py-3  hover:bg-blue-600 transistion ${
                 isActive ? "bg-blue-900 font-bold" : ""
               }`
             }

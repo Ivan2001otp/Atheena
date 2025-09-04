@@ -14,7 +14,6 @@ type Supervisor struct {
 	Email string `json:"email" bson:"email"`
 	PhoneNumber string `json:"phone_number" bson:"phone_number"`
 	Role string `json:"role" bson:"role"`
-	Created_At time.Time `json:"created_at" bson:"created_at"`
 }
 
 type User struct {

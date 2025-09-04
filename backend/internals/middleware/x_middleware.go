@@ -26,7 +26,6 @@ func TokenMiddleware(next http.Handler) http.Handler {
 
 
 			tokenStr := strings.TrimPrefix(authHeader, "Bearer ");
-			log.Println("Token sent in header : ", tokenStr);
 			secretKey := envConfig.LoadEnvConfig().JWT_Secret;
 
 			// Try to unmarshal the token to understand its authenticity.
@@ -65,6 +64,7 @@ func TokenMiddleware(next http.Handler) http.Handler {
 			claims := token.Claims.(jwt.MapClaims)
 			ctx := context.WithValue(r.Context(), "email", claims["email"]);
 			ctx = context.WithValue(ctx, "role", claims["role"]);
+			ctx = context.WithValue(ctx, "user_id", claims["user_id"]);
 			next.ServeHTTP(w, r.WithContext(ctx));
 		});
 }
