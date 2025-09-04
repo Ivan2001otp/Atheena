@@ -5,7 +5,7 @@ import { clearAuth, getAccessToken, getRefreshToken } from "./util";
 import JsCookies from "js-cookie"
 import toast from "react-hot-toast";
 import type { AddInventoryRequest, InventoryItem, InventoryResponse } from "@/models/inventory";
-import type { FetchallSupervisorResponse } from "@/models/supervisor";
+import type { CreateSupervisorRequest, FetchallSupervisorResponse } from "@/models/supervisor";
 
 
 const BASE_URL = "http://localhost:8080/api/v1";
@@ -315,4 +315,20 @@ export const FetchallSupervisorByAdminId = async(adminId : string) : Promise<Fet
 
     return Promise.reject(`Could not get 200 status while fetching all inventories for the given admin-id ${adminId}`);
 
+}
+
+export const UpsertSupervisor = async(payload : CreateSupervisorRequest) : Promise<StandardResponse> => {
+
+    try {
+        const res = await axiosInstance.post(`${BASE_URL}/upsert_supervisor`, payload);
+        console.log(res);
+        if (res.status === 200) {
+            return res.data;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+
+    return Promise.reject(`Could not get 200 status while fetching all inventories for the given admin-id ${payload.admin_id}`);
 }

@@ -80,7 +80,19 @@ func AddOrUpdateSupervisor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	supervisor.ID = primitive.NewObjectID()
+	log.Println(requestPayload);
+	supervisrIdStr, ok := requestPayload["id"].(string);
+	log.Println("supervisorIdStr is ", supervisrIdStr);
+	
+	if ok {
+		if (len(supervisrIdStr) > 0) {
+			log.Println("supervisor id exists.");
+			supervisor.ID, _ = primitive.ObjectIDFromHex(supervisrIdStr);
+		} 
+	} else {
+		log.Println("supervisor id is created.");
+		supervisor.ID = primitive.NewObjectID();
+	}
 
 	adminIdStr, ok := requestPayload["admin_id"].(string)
 	if ok {
@@ -107,8 +119,7 @@ func AddOrUpdateSupervisor(w http.ResponseWriter, r *http.Request) {
 		supervisor.Role = roleStr
 	}
 
-	supervisor.Created_At, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
-
+	
 	err = _mongo.UpsertNewSupervisor(supervisor)
 	if err != nil {
 		log.Println("❌Something wrong happened while upserting supervisor")
@@ -116,6 +127,7 @@ func AddOrUpdateSupervisor(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	
 
 	response := map[string]interface{}{
 		"success": true,

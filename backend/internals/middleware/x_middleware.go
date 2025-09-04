@@ -26,7 +26,6 @@ func TokenMiddleware(next http.Handler) http.Handler {
 
 
 			tokenStr := strings.TrimPrefix(authHeader, "Bearer ");
-			log.Println("Token sent in header : ", tokenStr);
 			secretKey := envConfig.LoadEnvConfig().JWT_Secret;
 
 			// Try to unmarshal the token to understand its authenticity.

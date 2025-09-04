@@ -249,25 +249,25 @@ func FetchInventoryByWarehouseId(warehouseId primitive.ObjectID) ([]_entities.In
 	defer cancel()
 
 	filter := bson.M{"warehouse_id": warehouseId}
-	cursor,err := collection.Find(ctx, filter);
+	cursor, err := collection.Find(ctx, filter)
 	if err != nil {
-		log.Println(err.Error());
-		log.Println("Something went wrong while fetching inventories for the warehouse-id : ",warehouseId);
-		return nil,err;
-	}
-
-	defer cursor.Close(ctx);
-
-	var inventoryList []_entities.InventoryItem;
-	if err = cursor.All(ctx, &inventoryList); err != nil {
-		log.Println("Something went wrong while parsing inventory mongo documents to golang object.");
 		log.Println(err.Error())
-		return nil, err;
+		log.Println("Something went wrong while fetching inventories for the warehouse-id : ", warehouseId)
+		return nil, err
 	}
 
-	log.Println("inventory records ", len(inventoryList));
-	log.Println("✅ Fetched Inventories successfully for warehouseId - ", warehouseId.Hex());
-	return inventoryList, nil;
+	defer cursor.Close(ctx)
+
+	var inventoryList []_entities.InventoryItem
+	if err = cursor.All(ctx, &inventoryList); err != nil {
+		log.Println("Something went wrong while parsing inventory mongo documents to golang object.")
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	log.Println("inventory records ", len(inventoryList))
+	log.Println("✅ Fetched Inventories successfully for warehouseId - ", warehouseId.Hex())
+	return inventoryList, nil
 }
 
 // Supervisor level CRUD
@@ -279,6 +279,7 @@ func UpsertNewSupervisor(supervisor _entities.Supervisor) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	log.Println("supervisor id : ", supervisor.ID.Hex())
 	filter := bson.M{"_id": supervisor.ID}
 	update := bson.M{
 		"$set": bson.M{
@@ -330,7 +331,7 @@ func DeleteSupervisor(supervisorID primitive.ObjectID, adminID primitive.ObjectI
 	return nil
 }
 
-func FetchSupervisorById(supervisorID primitive.ObjectID) (*_entities.Supervisor,error) {
+func FetchSupervisorById(supervisorID primitive.ObjectID) (*_entities.Supervisor, error) {
 	mongoDb, err := GetMongoClient()
 	handleDBConnection(err)
 
@@ -340,22 +341,22 @@ func FetchSupervisorById(supervisorID primitive.ObjectID) (*_entities.Supervisor
 	defer cancel()
 
 	filter := bson.M{
-		"_id":supervisorID,
+		"_id": supervisorID,
 	}
 
 	var supervisor _entities.Supervisor
-	err = collection.FindOne(ctx, filter).Decode(&supervisor);
+	err = collection.FindOne(ctx, filter).Decode(&supervisor)
 	if err != nil {
-		log.Println("Something went wrong while fetching supervisor.");
-		log.Println(err.Error());
-		return nil,err;
+		log.Println("Something went wrong while fetching supervisor.")
+		log.Println(err.Error())
+		return nil, err
 	}
 
-	log.Println("Successfully fetched supervisor.");
-	return &supervisor, nil;
+	log.Println("Successfully fetched supervisor.")
+	return &supervisor, nil
 }
 
-func FetchAllSupervisorByAdminId(adminId primitive.ObjectID) ([]_entities.Supervisor ,error) {
+func FetchAllSupervisorByAdminId(adminId primitive.ObjectID) ([]_entities.Supervisor, error) {
 	mongoDb, err := GetMongoClient()
 	handleDBConnection(err)
 
@@ -365,28 +366,27 @@ func FetchAllSupervisorByAdminId(adminId primitive.ObjectID) ([]_entities.Superv
 	defer cancel()
 
 	filter := bson.M{
-		"admin_id":adminId,
+		"admin_id": adminId,
 	}
 
-	cursor,err := collection.Find(ctx, filter);
+	cursor, err := collection.Find(ctx, filter)
 	if err != nil {
-		log.Println(err.Error());
-		log.Println("Something went wrong while fetching supervisors");
-		return nil,err;
-	}
-
-	defer cursor.Close(ctx);
-
-	var supervisorList []_entities.Supervisor;
-	if err = cursor.All(ctx, &supervisorList); err != nil {
-		log.Println("Something went wrong while parsing supervisor mongo documents to golang object.");
 		log.Println(err.Error())
-		return  nil,err;
+		log.Println("Something went wrong while fetching supervisors")
+		return nil, err
 	}
 
+	defer cursor.Close(ctx)
 
-	return supervisorList, nil;
-} 
+	var supervisorList []_entities.Supervisor
+	if err = cursor.All(ctx, &supervisorList); err != nil {
+		log.Println("Something went wrong while parsing supervisor mongo documents to golang object.")
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	return supervisorList, nil
+}
 
 // Admin level CRUD and token operations
 func InsertNewUser(user _entities.User) error {
