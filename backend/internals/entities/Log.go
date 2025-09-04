@@ -25,3 +25,15 @@ type CustomLog struct {
 	Log_Type LogType `json:"log_type" bson:"log_type"`
 	Updated time.Time `json:"updated_time" bson:"updated_time"`
 }
+
+type LogisticsReport struct {
+	ID                     primitive.ObjectID `bson:"_id,omitempty"`
+	FromWarehouseName      string             `bson:"from_warehouse_name"`
+	FromWarehouseLocation  string             `bson:"from_warehouse_location"`
+	ToDestinationName      string             `bson:"to_destination_name"`
+	ToDestinationLocation  string             `bson:"to_destination_location"`
+	SupplyName             string             `bson:"supply_name"`
+	SupplyQuantity         float64            `bson:"supply_quantity"`
+	SupplyUnit             string             `bson:"supply_unit"`
+	UpdatedTime            time.Time          `bson:"updated_time"`
+}

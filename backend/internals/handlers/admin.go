@@ -16,6 +16,36 @@ import (
 	// "atheena/internals/util"
 )
 
+// logs related CRUD
+func FetchAllLogs(w http.ResponseWriter, r *http.Request) {
+
+	if (r.Method != http.MethodGet) {
+		http.Error(w, "Only GET request is allowed", http.StatusBadRequest);
+		return;
+	}
+
+	admin_id := r.URL.Query().Get("admin_id");
+	if (len(admin_id) == 0) {
+		http.Error(w, "admin_id is missing in params.", http.StatusBadRequest);
+		return;
+	}
+
+	adminId,_ := primitive.ObjectIDFromHex(admin_id);
+	err,response := _mongo.FetchLogs(adminId);
+
+	if err != nil {
+		log.Println(err.Error());
+		http.Error(w, err.Error(), http.StatusInternalServerError);
+		return;
+	}
+
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"success":true,
+		"message":"Fetched logs successfully",
+		"data":response,
+	});
+}
+
 // supervisor related CRUD.
 func DeleteSupervisor(w http.ResponseWriter, r *http.Request) {
 
