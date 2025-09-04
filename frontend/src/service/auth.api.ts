@@ -4,6 +4,8 @@ import axios from "axios";
 import { clearAuth, getAccessToken, getRefreshToken } from "./util";
 import JsCookies from "js-cookie"
 import toast from "react-hot-toast";
+import type { AddInventoryRequest, InventoryItem, InventoryResponse } from "@/models/inventory";
+import type { FetchallSupervisorResponse } from "@/models/supervisor";
 
 
 const BASE_URL = "http://localhost:8080/api/v1";
@@ -88,7 +90,7 @@ axiosInstance.interceptors.response.use(
     }
 );
 
-
+// auth api
 export const LoginAdmin = async (
     payload: LoginRequest
 ): Promise<AdminAuthResponse> => {
@@ -245,4 +247,72 @@ export const AddNewWarehouse = async(
     }
     
     return Promise.reject("Could not get 200 status while adding new warehouse")
+}
+
+
+
+// Get Inventories for the given warehouse - id.
+export const FetchInventoryByWarehouseId = async (warehouseId:string) : Promise<InventoryResponse> => {
+
+     try {
+        const response = await axiosInstance.get(`${BASE_URL}/get_inventory`, {
+            params:{
+                "warehouse_id" :warehouseId,
+            },
+        });
+        console.log(response);
+
+        if (response.status === 200) {
+            return response.data;
+        }
+
+    }catch(error) { 
+        console.log("Something went wrong while fetching inventories by warehouse id");
+        console.log(error);
+    }
+
+
+    return Promise.reject(`Could not get 200 status while fetching all inventories for the given warehouse-id ${warehouseId}`);
+}
+
+export const AddInventoryOfSpecificWarehouse = async ( payload : AddInventoryRequest) : Promise<StandardResponse> => {
+
+    try {
+        const response = await axiosInstance.post(`${BASE_URL}/add_inventory`, payload);
+        console.log(response);
+
+        if (response.status === 200) {
+            return response.data;
+        }
+
+    }catch(error) { 
+        console.log("Something went wrong while fetching inventories by warehouse id");
+        console.log(error);
+    }
+
+    return Promise.reject(`Could not get 200 status while fetching all inventories for the given warehouse-id ${payload.warehouse_id}`);
+
+}
+
+
+// Supervisors related apis
+export const FetchallSupervisorByAdminId = async(adminId : string) : Promise<FetchallSupervisorResponse> => {
+
+    try {
+        const res = await axiosInstance.get(`${BASE_URL}/get_supervisors`, {
+            params:{
+                "admin_id":adminId,
+            }
+        });
+        console.log(res);
+        if (res.status === 200) {
+            return res.data;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+
+    return Promise.reject(`Could not get 200 status while fetching all inventories for the given admin-id ${adminId}`);
+
 }

@@ -125,6 +125,30 @@ func AddOrUpdateSupervisor(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(response)
 }
 
+func FetchAllSupervisor(w http.ResponseWriter, r *http.Request) {
+
+	if (r.Method != http.MethodGet) {
+		http.Error(w, "Only GET request", http.StatusBadRequest);
+		return;
+	}
+
+	adminIdStr := r.URL.Query().Get("admin_id");
+	adminId,_ := primitive.ObjectIDFromHex(adminIdStr)
+	supervisors, err := _mongo.FetchAllSupervisorByAdminId(adminId);
+
+	if err != nil {
+
+		http.Error(w, err.Error(), http.StatusInternalServerError);
+		return;
+	}
+
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"success":true,
+		"message":"Fetched supervisors successfully",
+		"data":supervisors,
+	});
+}
+
 // Adding inventory item to a particular warehouse id.
 func AddInventoryItem(w http.ResponseWriter, r *http.Request) {
 
@@ -193,6 +217,38 @@ func AddInventoryItem(w http.ResponseWriter, r *http.Request) {
 		"message": fmt.Sprintf("Upserted %s inventory successfully", inventoryItem.Name),
 	}
 	_ = json.NewEncoder(w).Encode(response)
+}
+
+func FetchInventoryByWarehouse(w http.ResponseWriter, r *http.Request) {
+
+	if (r.Method != http.MethodGet) {
+		http.Error(w, "Only GET request is available.", http.StatusBadRequest);
+		return;
+	}
+
+	warehouseIdStr := r.URL.Query().Get("warehouse_id");
+	if ( len(warehouseIdStr) == 0) {
+		log.Println("warehouseId is empty");
+		http.Error(w, "No warehouseId given as parameter to the API.", http.StatusBadRequest);
+		return;
+	}
+
+	warehouseId,_ := primitive.ObjectIDFromHex(warehouseIdStr);
+
+	var inventoryList []_entities.InventoryItem;
+
+	inventoryList, err := _mongo.FetchInventoryByWarehouseId(warehouseId);
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError);
+		return;
+	}
+
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"success":true,
+		"message":"Fetched inventories successfully",
+		"data":inventoryList,
+	})
+
 }
 
 // Fetch the constructions sites of the given admin id

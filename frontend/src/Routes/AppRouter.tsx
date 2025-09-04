@@ -14,6 +14,7 @@ import ProfilePage from "@/pages/Dashboard/ProfilePage";
 import ReportPage from "@/pages/Dashboard/ReportPage";
 import SitesPage from "@/pages/Dashboard/SitesPage";
 import TransactionPage from "@/pages/Dashboard/TransactionPage";
+import InventoryV2Page from "@/pages/Dashboard/InventoryV2Page";
 
 export default function AppRoutes() {
   return (
@@ -39,6 +40,15 @@ export default function AppRoutes() {
               <DashboardV2Page />
             </ProtectedRoute>
           }
+        />
+
+        <Route
+         path="inv-v2"
+         element={
+            <ProtectedRoute>
+                <InventoryV2Page/>
+            </ProtectedRoute>
+         }
         />
 
         <Route

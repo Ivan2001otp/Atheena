@@ -124,16 +124,7 @@ const WarehousePage: React.FC = () => {
       );
 
 
-    // const nw: AdminWarehouse = {
-    //   id:'',// testing
-    //   name: form.name.trim(),
-    //   address: form.address.trim(),
-    //   country: form.country.trim(),
-    //   state: form.state.trim(),
-    //   pin: form.pin.trim(),
-    //   user_id: localStorage.getItem(ADMIN_ID) ,
-    //   created_at: formatDateTimeV2( Date.now())//testing
-    // };
+    
       
     const payload: AddWarehouseRequest = {
         id: editingId,
