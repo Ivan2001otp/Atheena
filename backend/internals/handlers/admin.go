@@ -39,12 +39,64 @@ func FetchAllLogs(w http.ResponseWriter, r *http.Request) {
 		return;
 	}
 
-	log.Println("✅ Logs fetrched succesfully");
+	log.Println("✅ Logs fetched succesfully");
 	_ = json.NewEncoder(w).Encode(map[string]interface{}{
 		"success":true,
 		"message":"Fetched logs successfully",
 		"data":response,
 	});
+}
+
+
+func FetchOrders(w http.ResponseWriter, r *http.Request) {
+
+	if (r.Method != http.MethodGet) {
+		http.Error(w, "only GET request valid.", http.StatusBadRequest);
+		return;
+	}
+
+	adminIdStr := r.URL.Query().Get("admin_id");
+	adminId, _ := primitive.ObjectIDFromHex(adminIdStr);
+
+	err , result := _mongo.FetchOrders(adminId);
+	if err != nil {
+		log.Println(err.Error());
+		http.Error(w, err.Error(), http.StatusInternalServerError);
+		return;
+	}
+
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"success":true,
+		"message":"Fetched Order successfully",
+		"data":result,
+	});
+}
+
+
+// approval related CRUD
+func FetchAllApprovals(w http.ResponseWriter, r *http.Request) {
+
+	if (r.Method != http.MethodGet) {
+		http.Error(w, "only GET request valid.", http.StatusBadRequest);
+		return;
+	}
+
+	adminIdStr := r.URL.Query().Get("admin_id");
+	adminId ,_ := primitive.ObjectIDFromHex(adminIdStr);
+
+	err, approvalList := _mongo.FetchAllApprovals(adminId);
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError);
+		return;	
+	}
+
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"data":approvalList,
+		"message":"Fetched approvals successfully.",
+		"success":true,
+	});
+
 }
 
 // supervisor related CRUD.

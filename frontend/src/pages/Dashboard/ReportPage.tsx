@@ -86,7 +86,7 @@ const ReportPage = () => {
 
                   <TableBody>
                     {customLogs.map((log, index) => (
-                      <TableRow key={index}>
+                      <TableRow key={index} className='cursor-default'>
                           <TableCell>
                             <div className='flex flex-col space-y-1'>
                                 <div className='flex items-center gap-2'>

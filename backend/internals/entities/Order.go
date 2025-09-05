@@ -27,6 +27,26 @@ type OrderTracker struct {
 	Created_Time time.Time `json:"created_time" bson:"created_time"`
 }
 
+/*
+	"order_id":"$order_details._id",
+				"material_name":"$order_details.material_name",
+				"quantity":"$order_details.quantity",
+				"unit":"$order_details.unit",
+				"order_type":"$order_details.order_type",
+				"current_status":"$order_details.current_status",
+				"trackers":"$order_details.trackers",
+*/
+
+type OrderItem struct {
+	OrderID primitive.ObjectID `json:"order_id" bson:"_id"`
+	Material_Name string `json:"material_name" bson:"material_name"`
+	Quantity float64 `json:"quantity" bson:"quantity"`
+	Unit string `json:"unit" bson:"unit"`
+	OrderType string `json:"order_type" bson:"order_type"`
+	CurrentStatus string `json:"current_status" bson:"current_status"`
+	OrderTracker []OrderTracker `json:"trackers" bson:"trackers"`
+}
+
 type Order struct {
 	ID primitive.ObjectID `json:"id" bson:"_id"`
 	Log_ID primitive.ObjectID `json:"log_id" bson:"log_id"`

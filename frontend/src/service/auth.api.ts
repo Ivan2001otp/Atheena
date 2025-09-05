@@ -7,6 +7,8 @@ import toast from "react-hot-toast";
 import type { AddInventoryRequest, InventoryItem, InventoryResponse } from "@/models/inventory";
 import type { CreateSupervisorRequest, FetchallSupervisorResponse } from "@/models/supervisor";
 import type { FetchLogsResponse } from "@/models/customLog";
+import type { ApprovalResponse } from "@/models/approval";
+import type { OrderResponse } from "@/models/order";
 
 
 const BASE_URL = "http://localhost:8080/api/v1";
@@ -19,7 +21,7 @@ const axiosInstance = axios.create({
 // Request interceptor to attach tokens at every request.
 axiosInstance.interceptors.request.use(
     (config) => {
- const token = getAccessToken();
+        const token = getAccessToken();
 
         if (token) {
             console.log("token exists...");
@@ -53,7 +55,7 @@ axiosInstance.interceptors.response.use(
         } else if (error.response?.status === 401) {
             originalRequest._retry = false;
             toast.error("Invalid Credentials");
-            window.location.href="/login";
+            window.location.href = "/login";
         }
         else if (error.response?.status === 403) {
             originalRequest._retry = false;
@@ -68,7 +70,7 @@ axiosInstance.interceptors.response.use(
 
                     const res = await axiosInstance.post("/refresh-token", payload);
                     console.log(res);
-                    JsCookies.set(ACCESS_TOKEN, res.data.access_token, 
+                    JsCookies.set(ACCESS_TOKEN, res.data.access_token,
                         { expires: 0.0104, secure: true, sameSite: "Strict" });
 
 
@@ -117,9 +119,9 @@ export const LoginAdmin = async (
 };
 
 
-export const RegisterAdmin = async(
-    payload:AdminRegisterRequest
-) : Promise<AdminAuthResponse>=>{
+export const RegisterAdmin = async (
+    payload: AdminRegisterRequest
+): Promise<AdminAuthResponse> => {
     // post request
     const response = await axiosInstance.post(`${BASE_URL}/register`, payload);
     console.log("The status of RegisterAdmin api is ", response.status);
@@ -132,18 +134,18 @@ export const RegisterAdmin = async(
     return Promise.reject("Could not get 200 status while registering admin");
 };
 
-export const LogoutAdmin = async(
-    payload : AdminLogoutRequest
-): Promise<StandardResponse>=>{
+export const LogoutAdmin = async (
+    payload: AdminLogoutRequest
+): Promise<StandardResponse> => {
 
 
     console.log("logout request body")
     console.log(payload);
     try {
-        const response = await axiosInstance.post(`${BASE_URL}/logout`,{}, {
-            params:{
-                "email" : payload.email,
-                "role" : payload.role
+        const response = await axiosInstance.post(`${BASE_URL}/logout`, {}, {
+            params: {
+                "email": payload.email,
+                "role": payload.role
             },
         });
         // console.log(response);
@@ -154,23 +156,23 @@ export const LogoutAdmin = async(
             return response.data;
         }
 
-    } catch (error:any) {
+    } catch (error: any) {
         console.log("UI - something went wrong during logout")
         console.log(error)
     }
-    
+
     return Promise.reject("Could not get 200 status while logout admin")
 
 }
 
 
 // Construction site apis
-export const AddNewConstructionSite = async (payload: SiteModel): Promise<StandardResponse> =>{
+export const AddNewConstructionSite = async (payload: SiteModel): Promise<StandardResponse> => {
 
     try {
 
         const response = await axiosInstance.post(`${BASE_URL}/add_construction_site`, payload);
-        
+
         console.log(response);
         console.log("The status of Add-Ware-house api is ", response.status);
 
@@ -187,13 +189,13 @@ export const AddNewConstructionSite = async (payload: SiteModel): Promise<Standa
 
 }
 
-export const GetAllConstructionSites = async (adminIdStr:string) : Promise<SiteModel[]> => {
+export const GetAllConstructionSites = async (adminIdStr: string): Promise<SiteModel[]> => {
 
     try {
         const res = await axiosInstance.get(`${BASE_URL}/get_construction_sites/${adminIdStr}`)
         console.log(res)
 
-        if (res.status ===200)return res.data;
+        if (res.status === 200) return res.data;
 
     } catch (error) {
         console.log("Something went wrong while fetching all construction sites...");
@@ -206,8 +208,8 @@ export const GetAllConstructionSites = async (adminIdStr:string) : Promise<SiteM
 
 
 // Warehouse apis
-export const GetAllWarehouse = async(adminIdStr : string
-) : Promise<AdminWarehouse[]> => {
+export const GetAllWarehouse = async (adminIdStr: string
+): Promise<AdminWarehouse[]> => {
 
 
     try {
@@ -218,7 +220,7 @@ export const GetAllWarehouse = async(adminIdStr : string
             return response.data;
         }
 
-    }catch(error) { 
+    } catch (error) {
         console.log("Something went wrong while fetching warehouse by admin id");
         console.log(error);
     }
@@ -227,10 +229,10 @@ export const GetAllWarehouse = async(adminIdStr : string
 
 }
 
-export const AddNewWarehouse = async(
-    payload : AddWarehouseRequest
-) : Promise<StandardResponse> =>{ 
-    
+export const AddNewWarehouse = async (
+    payload: AddWarehouseRequest
+): Promise<StandardResponse> => {
+
     try {
         const response = await axiosInstance.post(`${BASE_URL}/add_warehouse`, payload);
 
@@ -246,19 +248,19 @@ export const AddNewWarehouse = async(
         console.log("Something went wrong while adding new warehouse !");
         console.log(error);
     }
-    
+
     return Promise.reject("Could not get 200 status while adding new warehouse")
 }
 
 
 
 // Get Inventories for the given warehouse - id.
-export const FetchInventoryByWarehouseId = async (warehouseId:string) : Promise<InventoryResponse> => {
+export const FetchInventoryByWarehouseId = async (warehouseId: string): Promise<InventoryResponse> => {
 
-     try {
+    try {
         const response = await axiosInstance.get(`${BASE_URL}/get_inventory`, {
-            params:{
-                "warehouse_id" :warehouseId,
+            params: {
+                "warehouse_id": warehouseId,
             },
         });
         console.log(response);
@@ -267,7 +269,7 @@ export const FetchInventoryByWarehouseId = async (warehouseId:string) : Promise<
             return response.data;
         }
 
-    }catch(error) { 
+    } catch (error) {
         console.log("Something went wrong while fetching inventories by warehouse id");
         console.log(error);
     }
@@ -276,7 +278,7 @@ export const FetchInventoryByWarehouseId = async (warehouseId:string) : Promise<
     return Promise.reject(`Could not get 200 status while fetching all inventories for the given warehouse-id ${warehouseId}`);
 }
 
-export const AddInventoryOfSpecificWarehouse = async ( payload : AddInventoryRequest) : Promise<StandardResponse> => {
+export const AddInventoryOfSpecificWarehouse = async (payload: AddInventoryRequest): Promise<StandardResponse> => {
 
     try {
         const response = await axiosInstance.post(`${BASE_URL}/add_inventory`, payload);
@@ -286,7 +288,7 @@ export const AddInventoryOfSpecificWarehouse = async ( payload : AddInventoryReq
             return response.data;
         }
 
-    }catch(error) { 
+    } catch (error) {
         console.log("Something went wrong while fetching inventories by warehouse id");
         console.log(error);
     }
@@ -297,12 +299,12 @@ export const AddInventoryOfSpecificWarehouse = async ( payload : AddInventoryReq
 
 
 // Supervisors related apis
-export const FetchallSupervisorByAdminId = async(adminId : string) : Promise<FetchallSupervisorResponse> => {
+export const FetchallSupervisorByAdminId = async (adminId: string): Promise<FetchallSupervisorResponse> => {
 
     try {
         const res = await axiosInstance.get(`${BASE_URL}/get_supervisors`, {
-            params:{
-                "admin_id":adminId,
+            params: {
+                "admin_id": adminId,
             }
         });
         console.log(res);
@@ -318,7 +320,7 @@ export const FetchallSupervisorByAdminId = async(adminId : string) : Promise<Fet
 
 }
 
-export const UpsertSupervisor = async(payload : CreateSupervisorRequest) : Promise<StandardResponse> => {
+export const UpsertSupervisor = async (payload: CreateSupervisorRequest): Promise<StandardResponse> => {
 
     try {
         const res = await axiosInstance.post(`${BASE_URL}/upsert_supervisor`, payload);
@@ -336,23 +338,69 @@ export const UpsertSupervisor = async(payload : CreateSupervisorRequest) : Promi
 
 
 // logs related apis
-export const FetchAllLogs = async (adminId : string) : Promise<FetchLogsResponse> => {
-    
+export const FetchAllLogs = async (adminId: string): Promise<FetchLogsResponse> => {
+
     try {
         const res = await axiosInstance.get(`${BASE_URL}/get_all_logs`, {
-            params : {
-                "admin_id" : adminId,
+            params: {
+                "admin_id": adminId,
             }
         });
-        
+
         console.log(res);
         if (res.status === 200) {
             return res.data;
         }
-    } catch (error ){ 
+    } catch (error) {
         console.log(error);
     }
 
     return Promise.reject(`Could not get 200 status while fetching all logs for the given admin-id ${adminId}`);
+
+}
+
+export const FetchAllApprovals = async (adminId: string): Promise<ApprovalResponse> => {
+
+    try {
+        const res = await axiosInstance.get(`${BASE_URL}/get_approvals`, {
+            params: {
+                "admin_id": adminId,
+            }
+        });
+
+        console.log(res.data);
+        if (res.status === 200) {
+            return res.data;
+        }
+
+
+    } catch (error) {
+        console.log(error);
+    }
+
+    return Promise.reject(`Could not get 200 status while fetching all approvals for the given admin-id ${adminId}`);
+
+}
+
+// order related apis
+export const FetchOrders = async (adminId: string): Promise<OrderResponse> => {
+
+    try {
+        const res = await axiosInstance.get(`${BASE_URL}/get_orders`, {
+            params: {
+                "admin_id": adminId,
+            }
+        });
+
+        console.log(res.data);
+        if (res.status === 200) {
+            return res.data;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+
+    return Promise.reject(`Could not get 200 status while fetching all orders for the given admin-id ${adminId}`);
 
 }
