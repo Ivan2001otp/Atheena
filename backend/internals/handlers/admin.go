@@ -19,6 +19,7 @@ import (
 // logs related CRUD
 func FetchAllLogs(w http.ResponseWriter, r *http.Request) {
 
+
 	if (r.Method != http.MethodGet) {
 		http.Error(w, "Only GET request is allowed", http.StatusBadRequest);
 		return;

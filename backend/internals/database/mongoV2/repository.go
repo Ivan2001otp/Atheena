@@ -201,6 +201,7 @@ func DeleteWarehouseById(warehouseId primitive.ObjectID) error {
 
 	// Fetch the inventory items of this warehouse
 	return nil
+
 }
 
 // Inventory related CRUD.
@@ -239,6 +240,7 @@ func AddNewInventoryItems(inventoryItem _entities.InventoryItem) error {
 
 	return nil
 }
+
 
 func FetchInventoryByWarehouseId(warehouseId primitive.ObjectID) ([]_entities.InventoryItem, error) {
 	mongoDb, err := GetMongoClient()
@@ -334,11 +336,11 @@ func DeleteSupervisor(supervisorID primitive.ObjectID, adminID primitive.ObjectI
 func FetchSupervisorById(supervisorID primitive.ObjectID) (*_entities.Supervisor, error) {
 	mongoDb, err := GetMongoClient()
 	handleDBConnection(err)
-
 	collection := mongoDb.Database(_util.DATABASE).Collection(_util.SUPERVISORS)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 
 	defer cancel()
+
 
 	filter := bson.M{
 		"_id": supervisorID,
@@ -385,6 +387,7 @@ func FetchAllSupervisorByAdminId(adminId primitive.ObjectID) ([]_entities.Superv
 		return nil, err
 	}
 
+
 	return supervisorList, nil
 }
 
@@ -408,7 +411,9 @@ func InsertNewUser(user _entities.User) error {
 func InsertAuthToken(authToken _entities.AuthToken) error {
 	mongoDb, err := GetMongoClient()
 
+
 	handleDBConnection(err)
+
 
 	collection := mongoDb.Database(_util.DATABASE).Collection(_util.TOKENS)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -535,6 +540,7 @@ func EmailExists(email string) (*_entities.User, error) {
 		}
 
 		return nil, err
+
 	}
 
 	return &user, nil
@@ -797,4 +803,5 @@ func FetchAllApprovals(adminId primitive.ObjectID) (error, [] _entities.Approval
 	}
 
 	return nil,approvalList;
+
 }

@@ -6,9 +6,11 @@ import JsCookies from "js-cookie"
 import toast from "react-hot-toast";
 import type { AddInventoryRequest, InventoryItem, InventoryResponse } from "@/models/inventory";
 import type { CreateSupervisorRequest, FetchallSupervisorResponse } from "@/models/supervisor";
+
 import type { FetchLogsResponse } from "@/models/customLog";
 import type { ApprovalResponse } from "@/models/approval";
 import type { OrderResponse } from "@/models/order";
+
 
 
 const BASE_URL = "http://localhost:8080/api/v1";
@@ -55,7 +57,8 @@ axiosInstance.interceptors.response.use(
         } else if (error.response?.status === 401) {
             originalRequest._retry = false;
             toast.error("Invalid Credentials");
-            window.location.href = "/login";
+window.location.href = "/login";
+
         }
         else if (error.response?.status === 403) {
             originalRequest._retry = false;
@@ -70,7 +73,9 @@ axiosInstance.interceptors.response.use(
 
                     const res = await axiosInstance.post("/refresh-token", payload);
                     console.log(res);
+
                     JsCookies.set(ACCESS_TOKEN, res.data.access_token,
+
                         { expires: 0.0104, secure: true, sameSite: "Strict" });
 
 
@@ -255,12 +260,14 @@ export const AddNewWarehouse = async (
 
 
 // Get Inventories for the given warehouse - id.
+
 export const FetchInventoryByWarehouseId = async (warehouseId: string): Promise<InventoryResponse> => {
 
     try {
         const response = await axiosInstance.get(`${BASE_URL}/get_inventory`, {
             params: {
                 "warehouse_id": warehouseId,
+
             },
         });
         console.log(response);
@@ -269,7 +276,9 @@ export const FetchInventoryByWarehouseId = async (warehouseId: string): Promise<
             return response.data;
         }
 
+
     } catch (error) {
+
         console.log("Something went wrong while fetching inventories by warehouse id");
         console.log(error);
     }
@@ -278,7 +287,9 @@ export const FetchInventoryByWarehouseId = async (warehouseId: string): Promise<
     return Promise.reject(`Could not get 200 status while fetching all inventories for the given warehouse-id ${warehouseId}`);
 }
 
+
 export const AddInventoryOfSpecificWarehouse = async (payload: AddInventoryRequest): Promise<StandardResponse> => {
+
 
     try {
         const response = await axiosInstance.post(`${BASE_URL}/add_inventory`, payload);
@@ -288,7 +299,9 @@ export const AddInventoryOfSpecificWarehouse = async (payload: AddInventoryReque
             return response.data;
         }
 
+
     } catch (error) {
+
         console.log("Something went wrong while fetching inventories by warehouse id");
         console.log(error);
     }
@@ -305,6 +318,7 @@ export const FetchallSupervisorByAdminId = async (adminId: string): Promise<Fetc
         const res = await axiosInstance.get(`${BASE_URL}/get_supervisors`, {
             params: {
                 "admin_id": adminId,
+
             }
         });
         console.log(res);
@@ -322,6 +336,7 @@ export const FetchallSupervisorByAdminId = async (adminId: string): Promise<Fetc
 
 export const UpsertSupervisor = async (payload: CreateSupervisorRequest): Promise<StandardResponse> => {
 
+
     try {
         const res = await axiosInstance.post(`${BASE_URL}/upsert_supervisor`, payload);
         console.log(res);
@@ -334,6 +349,7 @@ export const UpsertSupervisor = async (payload: CreateSupervisorRequest): Promis
     }
 
     return Promise.reject(`Could not get 200 status while fetching all inventories for the given admin-id ${payload.admin_id}`);
+
 }
 
 
@@ -402,5 +418,6 @@ export const FetchOrders = async (adminId: string): Promise<OrderResponse> => {
     }
 
     return Promise.reject(`Could not get 200 status while fetching all orders for the given admin-id ${adminId}`);
+
 
 }

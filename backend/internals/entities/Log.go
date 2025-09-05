@@ -14,6 +14,14 @@ const (
 	SiteLog     LogType = "CONSTRUCTION_SITE"
 )
 
+type LogType string
+
+const (
+	InboundLog LogType = "INBOUND"
+	OutboundLog LogType = "OUTBOUND"
+	SiteLog LogType = "CONSTRUCTION_SITE"
+)
+
 type CustomLog struct {
 	ID       primitive.ObjectID `json:"_id" bson:"_id"` // p.k
 	AdminId  primitive.ObjectID `json:"admin_id" bson:"admin_id"`
@@ -48,3 +56,4 @@ type LogisticsReport struct {
 	SupplyUnit     string    `bson:"supply_unit" json:"supply_unit"`
 	UpdatedTime    time.Time `bson:"updated_time" json:"updated_time"`
 }
+
