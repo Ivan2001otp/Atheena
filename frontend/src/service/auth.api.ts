@@ -6,6 +6,7 @@ import JsCookies from "js-cookie"
 import toast from "react-hot-toast";
 import type { AddInventoryRequest, InventoryItem, InventoryResponse } from "@/models/inventory";
 import type { CreateSupervisorRequest, FetchallSupervisorResponse } from "@/models/supervisor";
+import type { FetchLogsResponse } from "@/models/customLog";
 
 
 const BASE_URL = "http://localhost:8080/api/v1";
@@ -331,4 +332,27 @@ export const UpsertSupervisor = async(payload : CreateSupervisorRequest) : Promi
     }
 
     return Promise.reject(`Could not get 200 status while fetching all inventories for the given admin-id ${payload.admin_id}`);
+}
+
+
+// logs related apis
+export const FetchAllLogs = async (adminId : string) : Promise<FetchLogsResponse> => {
+    
+    try {
+        const res = await axiosInstance.get(`${BASE_URL}/get_all_logs`, {
+            params : {
+                "admin_id" : adminId,
+            }
+        });
+        
+        console.log(res);
+        if (res.status === 200) {
+            return res.data;
+        }
+    } catch (error ){ 
+        console.log(error);
+    }
+
+    return Promise.reject(`Could not get 200 status while fetching all logs for the given admin-id ${adminId}`);
+
 }

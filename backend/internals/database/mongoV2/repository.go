@@ -540,7 +540,6 @@ func EmailExists(email string) (*_entities.User, error) {
 	return &user, nil
 }
 
-
 // Fetch logs. This query includes multiple joins
 func FetchLogs(adminId primitive.ObjectID) (error, []_entities.LogisticsReport) {
 	mongoDb, err := GetMongoClient()
@@ -550,93 +549,108 @@ func FetchLogs(adminId primitive.ObjectID) (error, []_entities.LogisticsReport) 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-
+	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "admin_id", Value: adminId}}}}
 	pipeline := mongo.Pipeline{
-		// {{Key: "$match", Value: bson.M{"admin_id": adminId}}},
-
+		matchStage,
 		// Stage 1 : look up to Inventory
-		{{Key : "$lookup", Value : bson.M{
-			"from" : _util.INVENTORY,
-			"localField" : "supply_id",
-			"foreignField":"_id",
-			"as":"supply_details",
+		{{Key: "$lookup", Value: bson.M{
+			"from":         _util.INVENTORY,
+			"localField":   "supply_id",
+			"foreignField": "_id",
+			"as":           "supply_details",
 		}}},
 
 		// unwind the array.
 		{{
-				Key: "$unwind", Value: "$supply_details",
+			Key: "$unwind", Value: bson.M{"path": "$supply_details", "preserveNullAndEmptyArrays": true},
 		}},
 
-
 		// Stage 2: Look up 'from-warehouse' details
-			{{
-				Key: "$lookup",Value: bson.M{
-					"from":_util.WAREHOUSES,
-					"localField":"from_warehouse_id",
-					"foreignField": "_id",
-					"as": "from_warehouse_details",
+		{{
+			Key: "$lookup", Value: bson.M{
+				"from":         _util.WAREHOUSES,
+				"localField":   "from_warehouse_id",
+				"foreignField": "_id",
+				"as":           "from_warehouse_details",
 			}}},
 
-			{{Key:"$unwind", Value:"$from_warehouse_details"}},
+		{{Key: "$unwind", Value: bson.M{
+			"path":                       "$from_warehouse_details",
+			"preserveNullAndEmptyArrays": true}}},
 
 		// Stage 3 : Look up to-warehouse details
-		{{Key:"$lookup", Value:bson.M{
-				"from":_util.WAREHOUSES,
-				"localField":"to_warehouse_id",
-				"foreignField":"_id",
-				"as":"to_warehouse_details",
-			}}},
-
-		{{Key:"$unwind", Value:bson.M{
-			"path":"$to_warehouse_details",
-			"preserveNullAndEmptyArrays":true,
+		{{Key: "$lookup", Value: bson.M{
+			"from":         _util.WAREHOUSES,
+			"localField":   "to_warehouse_id",
+			"foreignField": "_id",
+			"as":           "to_warehouse_details",
 		}}},
 
-		
-		// Stage 4 : Lookup the site details
-		{{Key:"$lookup", Value: bson.M{
-			"from":_util.SITES,
-			"localField":"site_id",
-			"foreignField":"_id",
-			"as":"site_details",
+		{{Key: "$unwind", Value: bson.M{
+			"path":                       "$to_warehouse_details",
+			"preserveNullAndEmptyArrays": true,
 		}}},
 
-		{{Key:"$unwind", Value:bson.M{
-			"path":"$site_details",
-			"preserveNullAndEmptyArrays":true,
+		// // Stage 4 : Lookup the site details
+		{{Key: "$lookup", Value: bson.M{
+			"from":         _util.SITES,
+			"localField":   "site_id",
+			"foreignField": "_id",
+			"as":           "site_details",
 		}}},
 
+		{{Key: "$unwind", Value: bson.M{
+			"path":                       "$site_details",
+			"preserveNullAndEmptyArrays": true,
+		}}},
 
-		// Stage 5 : Project and final output the fields.
-		{{Key : "$project", Value: bson.M{
-			"_id":"$_id",
-			"from_warehouse_name":"$from_warehouse_details.name",
-			"from_warehouse_location":"$from_warehouse_details.address",
+		// // Stage 5 : Project and final output the fields.
+		{{Key: "$project", Value: bson.M{
+			"_id":                     "$_id",
+			"from_warehouse_name":     "$from_warehouse_details.name",
+			"from_warehouse_location": "$from_warehouse_details.address",
+			"from_warehouse_state":    "$from_warehouse_details.state",
+			"from_warehouse_country":  "$from_warehouse_details.country",
+
 			"to_destination_name": bson.M{
-				"$ifNull": bson.A{
-          "$to_warehouse_details.name", "$site_details.name"}},
-			"to_destination_location" : bson.M{
-				"$ifNull" : bson.A{"$to_warehouse_details.address",
-          "$site_details.address"}},
+				"$ifNull": bson.A{"$to_warehouse_details.name", "$site_details.name"}},
 
-			"supply_name": "$supply_details.name",
+			"to_destination_location": bson.M{
+				"$ifNull": bson.A{"$to_warehouse_details.address",
+					"$site_details.address"}},
+
+			"to_destination_state": bson.M{
+				"$ifNull": bson.A{"$to_warehouse_details.state", "$site_details.state"}},
+			
+			"to_destination_country": bson.M{
+				"$ifNull": bson.A{"$to_warehouse_details.country", "$site_details.country"}},
+
+			
+			"is_site" : bson.M{
+				"$cond" : bson.M{
+					"if" : "$site_details",
+					"then":true,
+					"else":false,
+				}},
+
+			"supply_name":     "$supply_details.name",
 			"supply_quantity": "$supply_details.quantity",
-			"supply_unit": "$supply_details.unit",
-			"updated_time": "$updated_time",
+			"supply_unit":     "$supply_details.unit",
+			"updated_time":    "$updated_time",
 		}}},
 	}
 
-	var response []_entities.LogisticsReport;
-	cursor, err := collection.Aggregate(ctx, pipeline);
+	var response []_entities.LogisticsReport
+	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
-		log.Println("Something went wrong while fetching log details");
-		return  err, nil;
+		log.Println("Something went wrong while fetching log details")
+		return err, nil
 	}
 
 	if err := cursor.All(ctx, &response); err != nil {
-		log.Println("Something went wrong, while parsing response");
-		return err, nil;
+		log.Println("Something went wrong, while parsing response")
+		return err, nil
 	}
-	return nil, response;
+	return nil, response
 
 }

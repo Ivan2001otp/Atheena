@@ -39,6 +39,7 @@ func FetchAllLogs(w http.ResponseWriter, r *http.Request) {
 		return;
 	}
 
+	log.Println("✅ Logs fetrched succesfully");
 	_ = json.NewEncoder(w).Encode(map[string]interface{}{
 		"success":true,
 		"message":"Fetched logs successfully",

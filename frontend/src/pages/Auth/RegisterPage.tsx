@@ -194,7 +194,7 @@ const RegisterPage = () => {
               <CardFooter className="flex flex-col gap-3 mt-8">
                 <Button
                   type="submit"
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white hover:rounded-xl shadow-md transition-all"
+                  className="w-full bg-indigo-600 hover:bg-indigo-700 cursor-pointer text-white hover:rounded-xl shadow-md transition-all"
                 >
                   { isLoading ? "Registering..." : "Register"}
                 </Button>
