@@ -9,7 +9,8 @@ import {
   User,
   LucideConstruction,
   WarehouseIcon,
-  LogOut
+  LogOut,
+  Logs
 } from "lucide-react";
 
 import {
@@ -46,7 +47,7 @@ export default function Sidebar({ collapsed}: SidebarProps1) {
       icon: <ClipboardList />,
     },
     { name: "Sites", path: "/atheena/sites", icon: <LucideConstruction /> },
-    { name: "Reports", path: "/atheena/reports", icon: <BarChart3 /> },
+    { name: "Logs", path: "/atheena/reports", icon: <Logs /> },
     { name: "Profile", path: "/atheena/profile", icon: <User /> },
   ];
 

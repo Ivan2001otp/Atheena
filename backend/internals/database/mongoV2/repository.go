@@ -201,6 +201,7 @@ func DeleteWarehouseById(warehouseId primitive.ObjectID) error {
 
 	// Fetch the inventory items of this warehouse
 	return nil
+
 }
 
 // Inventory related CRUD.
@@ -239,6 +240,7 @@ func AddNewInventoryItems(inventoryItem _entities.InventoryItem) error {
 
 	return nil
 }
+
 
 func FetchInventoryByWarehouseId(warehouseId primitive.ObjectID) ([]_entities.InventoryItem, error) {
 	mongoDb, err := GetMongoClient()
@@ -334,11 +336,11 @@ func DeleteSupervisor(supervisorID primitive.ObjectID, adminID primitive.ObjectI
 func FetchSupervisorById(supervisorID primitive.ObjectID) (*_entities.Supervisor, error) {
 	mongoDb, err := GetMongoClient()
 	handleDBConnection(err)
-
 	collection := mongoDb.Database(_util.DATABASE).Collection(_util.SUPERVISORS)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 
 	defer cancel()
+
 
 	filter := bson.M{
 		"_id": supervisorID,
@@ -385,6 +387,7 @@ func FetchAllSupervisorByAdminId(adminId primitive.ObjectID) ([]_entities.Superv
 		return nil, err
 	}
 
+
 	return supervisorList, nil
 }
 
@@ -408,7 +411,9 @@ func InsertNewUser(user _entities.User) error {
 func InsertAuthToken(authToken _entities.AuthToken) error {
 	mongoDb, err := GetMongoClient()
 
+
 	handleDBConnection(err)
+
 
 	collection := mongoDb.Database(_util.DATABASE).Collection(_util.TOKENS)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -535,7 +540,268 @@ func EmailExists(email string) (*_entities.User, error) {
 		}
 
 		return nil, err
+
 	}
 
 	return &user, nil
+}
+
+// Fetch logs. This query includes multiple joins
+func FetchLogs(adminId primitive.ObjectID) (error, []_entities.LogisticsReport) {
+	mongoDb, err := GetMongoClient()
+	handleDBConnection(err)
+
+	collection := mongoDb.Database(_util.DATABASE).Collection(_util.LOGS)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "admin_id", Value: adminId}}}}
+	pipeline := mongo.Pipeline{
+		matchStage,
+		// Stage 1 : look up to Inventory
+		{{Key: "$lookup", Value: bson.M{
+			"from":         _util.INVENTORY,
+			"localField":   "supply_id",
+			"foreignField": "_id",
+			"as":           "supply_details",
+		}}},
+
+		// unwind the array.
+		{{
+			Key: "$unwind", Value: bson.M{"path": "$supply_details", "preserveNullAndEmptyArrays": true},
+		}},
+
+		// Stage 2: Look up 'from-warehouse' details
+		{{
+			Key: "$lookup", Value: bson.M{
+				"from":         _util.WAREHOUSES,
+				"localField":   "from_warehouse_id",
+				"foreignField": "_id",
+				"as":           "from_warehouse_details",
+			}}},
+
+		{{Key: "$unwind", Value: bson.M{
+			"path":   "$from_warehouse_details",
+			"preserveNullAndEmptyArrays": true}}},
+
+		// Stage 3 : Look up to-warehouse details
+		{{Key: "$lookup", Value: bson.M{
+			"from":         _util.WAREHOUSES,
+			"localField":   "to_warehouse_id",
+			"foreignField": "_id",
+			"as":           "to_warehouse_details",
+		}}},
+
+		{{Key: "$unwind", Value: bson.M{
+			"path":                       "$to_warehouse_details",
+			"preserveNullAndEmptyArrays": true,
+		}}},
+
+		// // Stage 4 : Lookup the site details
+		{{Key: "$lookup", Value: bson.M{
+			"from":         _util.SITES,
+			"localField":   "site_id",
+			"foreignField": "_id",
+			"as":           "site_details",
+		}}},
+
+		{{Key: "$unwind", Value: bson.M{
+			"path":                       "$site_details",
+			"preserveNullAndEmptyArrays": true,
+		}}},
+
+		// // Stage 5 : Project and final output the fields.
+		{{Key: "$project", Value: bson.M{
+			"_id":                     "$_id",
+			"from_warehouse_name":     "$from_warehouse_details.name",
+			"from_warehouse_location": "$from_warehouse_details.address",
+			"from_warehouse_state":    "$from_warehouse_details.state",
+			"from_warehouse_country":  "$from_warehouse_details.country",
+
+			"to_destination_name": bson.M{
+				"$ifNull": bson.A{"$to_warehouse_details.name", "$site_details.name"}},
+
+			"to_destination_location": bson.M{
+				"$ifNull": bson.A{"$to_warehouse_details.address",
+					"$site_details.address"}},
+
+			"to_destination_state": bson.M{
+				"$ifNull": bson.A{"$to_warehouse_details.state", "$site_details.state"}},
+			
+			"to_destination_country": bson.M{
+				"$ifNull": bson.A{"$to_warehouse_details.country", "$site_details.country"}},
+
+			
+			"is_site" : bson.M{
+				"$cond" : bson.M{
+					"if" : "$site_details",
+					"then":true,
+					"else":false,
+				}},
+
+			"supply_name":     "$supply_details.name",
+			"supply_quantity": "$supply_details.quantity",
+			"supply_unit":     "$supply_details.unit",
+			"updated_time":    "$updated_time",
+		}}},
+	}
+
+	var response []_entities.LogisticsReport
+	cursor, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		log.Println("Something went wrong while fetching log details")
+		return err, nil
+	}
+
+	if err := cursor.All(ctx, &response); err != nil {
+		log.Println("Something went wrong, while parsing response")
+		return err, nil
+	}
+	return nil, response
+}
+
+
+func FetchOrders(adminId primitive.ObjectID) (error, []_entities.OrderItem) {
+	mongoDb, err := GetMongoClient()
+	handleDBConnection(err)
+
+	collection := mongoDb.Database(_util.DATABASE).Collection(_util.LOGS);
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second);
+	defer cancel();
+
+
+	matchStage := bson.D{{Key : "$match", Value : bson.D{{Key : "admin_id", Value:adminId}}}}
+
+	pipeline := mongo.Pipeline{
+		matchStage,
+
+		// stage 2 : join orders collection using lookup
+		{
+			{Key:"$lookup", Value: bson.M{
+				"from":_util.ORDERS,
+				"localField":"_id",
+				"foreignField":"log_id",
+				"as":"order_details"}}},
+
+		// stage 3
+		{{
+			Key : "$unwind", Value : bson.M{"path" : "$order_details", "preserveNullAndEmptyArrays":true},
+		}},
+
+		// stage 4
+		{{
+			Key : "$project", Value : bson.M{
+				"order_id":"$order_details._id",
+				"material_name":"$order_details.material_name",
+				"quantity":"$order_details.quantity",
+				"unit":"$order_details.unit",
+				"order_type":"$order_details.order_type",
+				"current_status":"$order_details.current_status",
+				"trackers":"$order_details.trackers",
+			}}},
+	}
+
+	cursor, err := collection.Aggregate(ctx, pipeline);
+	if err != nil {
+		log.Println("Failed to fetch order records.");
+		log.Println(err.Error());
+		return err, nil;
+	}
+
+	var result []_entities.OrderItem;
+	if err := cursor.All(ctx, &result); err != nil {
+		log.Println("Something went wrong, while parsing approval List");
+		return err, nil
+	}
+
+	return nil, result;
+}
+
+func FetchAllApprovals(adminId primitive.ObjectID) (error, [] _entities.ApprovalResponse) {
+	mongoDb, err := GetMongoClient()
+	handleDBConnection(err)
+
+	collection := mongoDb.Database(_util.DATABASE).Collection(_util.APPROVALS);
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second);
+	defer cancel();
+
+
+	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "admin_id", Value: adminId}}}}
+
+	pipeline := mongo.Pipeline{
+		matchStage,
+
+		// stage look up supervisor collection
+		{{Key : "$lookup", Value: bson.M{
+			"from":_util.SUPERVISORS,
+			"localField": "provider_id",
+			"foreignField" : "_id",
+			"as" : "supervisor_details",
+		}}},
+
+		{{
+			Key : "$unwind", Value : bson.M{"path" : "$supervisor_details", "preserveNullAndEmptyArrays":true},
+		}},
+
+
+		// stage look up inventory collection.
+		{{
+			Key : "$lookup", Value : bson.M{
+				"from" : _util.INVENTORY,
+				"localField": "supply_id",
+				"foreignField" : "_id",
+				"as" : "inventory_details",
+			}}},
+
+		{{
+			Key : "$unwind", Value : bson.M{"path" : "$inventory_details", "preserveNullAndEmptyArrays":true},
+		}},
+
+
+		// stage look up source/from-warehouse collection.
+		{{
+			Key : "$lookup", Value : bson.M{
+				"from":_util.WAREHOUSES,
+				"localField":"from_id",
+				"foreignField":"_id",
+				"as" : "from_warehouse_details",
+			}}},
+		{{
+			Key : "$unwind", Value : bson.M{"path" : "$from_warehouse_details", "preserveNullAndEmptyArrays" : true}}},
+
+
+
+		// projection stage
+		{{
+			Key : "$project", Value : bson.M{
+				"_id": "$_id",
+				"from_warehouse_name": "$from_warehouse_details.name",
+				"from_warehouse_location" : "$from_warehouse_details.address",
+				"from_warehouse_state":"$from_warehouse_details.state",
+				"from_warehouse_country": "$from_warehouse_details.country",
+				"status":"$status",
+				"reason":"$reason",
+				"supply_name":     "$inventory_details.name",
+				"supervisor_name": "$supervisor_details.name",
+				"updated_time":    "$updated_at",
+		}}},
+	}
+
+
+	var approvalList []_entities.ApprovalResponse;
+ 	cursor, err :=  collection.Aggregate(ctx, pipeline);
+
+	if err != nil {
+		log.Println("Something went wrong while fetching approvals.");
+		log.Println(err.Error());
+		return err, nil;
+	}
+
+	if err := cursor.All(ctx, &approvalList); err != nil {
+		log.Println("Something went wrong, while parsing approval List");
+		return err, nil
+	}
+
+	return nil,approvalList;
+
 }

@@ -33,6 +33,12 @@ func RegisterAdminRouters(apiRouter *mux.Router) {
 	apiRouter.HandleFunc("/add_inventory", handlers.AddInventoryItem).Methods("POST");
 	apiRouter.HandleFunc("/get_inventory", handlers.FetchInventoryByWarehouse).Methods("GET");
 
+
+	apiRouter.HandleFunc("/get_all_logs", handlers.FetchAllLogs).Methods("GET");
+	apiRouter.HandleFunc("/get_approvals", handlers.FetchAllApprovals).Methods("GET");
+	apiRouter.HandleFunc("/get_orders", handlers.FetchOrders).Methods("GET");
+	
+
 	// order tracking system endpoints
 	apiRouter.HandleFunc("/approve_order", handlers.InteractOrderApproval).Methods("GET");
 }
