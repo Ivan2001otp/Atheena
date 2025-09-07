@@ -1,4 +1,5 @@
 import ApprovalCard from '@/components/custom/ApprovalCard';
+import OrderCard from '@/components/custom/OrderCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { Approval } from '@/models/approval';
 import { ADMIN_ID } from '@/models/auth';
@@ -54,6 +55,8 @@ const TransactionPage = () => {
 
 
   return (
+
+    /*
     <main className='container mx-auto p-4 md:p-8'>
         <div className='flex justify-between items-center mb-6'>
           <h1 className='text-3xl font-bold tracking-tight'>Supply Chain Approvals</h1>
@@ -80,16 +83,44 @@ const TransactionPage = () => {
         </TabsContent>
 
         <TabsContent value='orders'>
-            <div>
+            
               {
                 orders.map((item, index)=>(
-                  <h2 key={index}> {item.current_status}</h2>
+                  <OrderCard key={index} order={item}/>
                 ))
               }
-            </div>
         </TabsContent>
         </Tabs>
     </main>
+    */
+
+     <div className="min-h-screen flex flex-col">
+      <main className="container mx-auto p-4 md:p-8 flex-grow font-sans">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Supply Chain Dashboard</h1>
+        </div>
+        <Tabs defaultValue="approvals" onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="approvals">Approvals</TabsTrigger>
+            <TabsTrigger value="orders">Orders</TabsTrigger>
+          </TabsList>
+          <TabsContent value="approvals" className="mt-4">
+            <div className="space-y-4">
+              {approvalList.map((approval,index) => (
+                <ApprovalCard key={index} approval={approval} />
+              ))}
+            </div>
+          </TabsContent>
+          <TabsContent value="orders" className="mt-4">
+            <div className="space-y-4">
+              {orders.map((order) => (
+                <OrderCard key={order.order_id} order={order} />
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </main>
+    </div>
   )
 }
 
