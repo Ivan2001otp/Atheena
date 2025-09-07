@@ -3,6 +3,12 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+
+  min-width: 1280px;
+  width: 1280px;
+  min-height: 800px;
+  height: 800px;
+  overflow: hidden;
 }
 
 .logo {
