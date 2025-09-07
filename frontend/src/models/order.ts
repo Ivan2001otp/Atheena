@@ -7,6 +7,7 @@ export interface OrderItem {
     order_type:string;
     current_status:string;
     trackers : OrderTracker[]
+
 }
 
 export interface OrderTracker {
